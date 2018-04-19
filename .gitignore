@@ -1,0 +1,8 @@
+/.idea/
+/bin/composer
+/bin/jsonlint
+/bin/phing
+/bin/validate-json
+/composer.lock
+/doc/
+/vendor/
