@@ -1,10 +1,22 @@
 #!/usr/bin/env php
 <?php
 //----------------------------------------------------------------------------------------------------------------------
-require_once(__DIR__.'/../vendor/autoload.php');
+use SetBased\Abc\Console\Application\AbcApplication;
 
 //----------------------------------------------------------------------------------------------------------------------
-use SetBased\Abc\Console\Application\AbcApplication;
+$files = [__DIR__.'/../../../../vendor/autoload.php',
+          __DIR__.'/../../../vendor/autoload.php',
+          __DIR__.'/../../vendor/autoload.php',
+          __DIR__.'/../vendor/autoload.php'];
+
+foreach ($files as $file)
+{
+  if (file_exists($file))
+  {
+    require $file;
+    break;
+  }
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 $application = new AbcApplication();
