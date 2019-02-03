@@ -50,7 +50,7 @@ class AbcXmlHelper
    *
    * @return string[]
    */
-  public static function getAbcXmlOfInstalledPackages(Composer $composer): string
+  public static function getAbcXmlOfInstalledPackages(Composer $composer): array
   {
     $list = [];
 
