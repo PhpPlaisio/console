@@ -30,7 +30,7 @@ class AbcXmlHelper
    *
    * @param string $path The path to the abc.xml file.
    */
-  public function __construct($path)
+  public function __construct(string $path)
   {
     $this->path = $path;
 
@@ -50,11 +50,9 @@ class AbcXmlHelper
    *
    * @return string[]
    */
-  public static function getAbcXmlOfInstalledPackages($composer)
+  public static function getAbcXmlOfInstalledPackages(Composer $composer): string
   {
     $list = [];
-
-    $cwd = getcwd();
 
     $repositoryManager   = $composer->getRepositoryManager();
     $installationManager = $composer->getInstallationManager();
@@ -64,27 +62,43 @@ class AbcXmlHelper
     foreach ($packages as $package)
     {
       $installPath = $installationManager->getInstallPath($package);
-      $path        = $installPath.'/abc.xml';
+      $path        = $installPath.DIRECTORY_SEPARATOR.'abc.xml';
       if (is_file($path))
       {
-        if (strncmp($path, $cwd, strlen($cwd))===0)
-        {
-          $path = ltrim(substr($path, strlen($cwd)), DIRECTORY_SEPARATOR);
-        }
-        $list[] = $path;
+        $list[$package->getName()] = self::relativePath($path);
       }
     }
 
-    sort($list);
+    asort($list);
 
     return $list;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
+   * Returns the relative path of path if the path is below the cwd. Otherwise returns the path unmodified.
+   *
+   * @param string $path The path.
+   *
    * @return string
    */
-  public function getStratumConfigFilename()
+  private static function relativePath(string $path): string
+  {
+    $cwd = getcwd();
+
+    if (strncmp($path, $cwd, strlen($cwd))===0)
+    {
+      return ltrim(substr($path, strlen($cwd)), DIRECTORY_SEPARATOR);
+    }
+
+    return $path;
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
+   * @return string
+   */
+  public function getStratumConfigFilename(): string
   {
     $xpath = new \DOMXpath($this->xml);
     $node  = $xpath->query('/abc/stratum/config')->item(0);
@@ -103,7 +117,7 @@ class AbcXmlHelper
    *
    * @return string[]
    */
-  public function getStratumSourcePatterns()
+  public function getStratumSourcePatterns(): array
   {
     $patterns = [];
 
