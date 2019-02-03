@@ -10,7 +10,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Command for collecting source patterns for find stored routines provided by packages.
+ * Command for collecting source patterns for finding stored routines provided by packages.
  */
 class StratumSourcesCommand extends Command
 {
@@ -52,7 +52,7 @@ class StratumSourcesCommand extends Command
    * Saves the Stratum sources patterns to a file.
    *
    * @param string   $sourcesFilename The name of the file.
-   * @param string[] $patterns The Stratum sources patterns.
+   * @param string[] $patterns        The Stratum sources patterns.
    */
   protected function saveSourcePatterns($sourcesFilename, $patterns)
   {
