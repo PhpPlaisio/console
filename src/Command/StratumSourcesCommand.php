@@ -54,7 +54,7 @@ class StratumSourcesCommand extends Command
    * @param string   $sourcesFilename The name of the file.
    * @param string[] $patterns        The Stratum sources patterns.
    */
-  protected function saveSourcePatterns($sourcesFilename, $patterns)
+  protected function saveSourcePatterns(string $sourcesFilename, array $patterns): void
   {
     $this->io->notice(sprintf("Writing sources patterns to '%s'", $sourcesFilename));
 
@@ -69,7 +69,7 @@ class StratumSourcesCommand extends Command
    *
    * @return string[]
    */
-  private function findStratumSourcePatterns()
+  private function findStratumSourcePatterns(): array
   {
     $composer = Factory::create($this->io);
 
@@ -105,7 +105,7 @@ class StratumSourcesCommand extends Command
    *
    * @return string
    */
-  private function sourcesListFilename($configFilename)
+  private function sourcesListFilename(string $configFilename): string
   {
     $settings = parse_ini_file($configFilename, true);
 
@@ -139,7 +139,7 @@ class StratumSourcesCommand extends Command
    *
    * @return string
    */
-  private function stratumConfigFilename()
+  private function stratumConfigFilename(): string
   {
     $abcXmlPath = 'abc.xml';
     if (!is_file($abcXmlPath))
