@@ -28,7 +28,7 @@ class StratumSourcesCommand extends Command
    */
   protected function configure()
   {
-    $this->setName('stratum-sources')
+    $this->setName('abc:stratum-sources')
          ->setDescription('Sets the stratum patterns for finding sources of stored routines');
   }
 

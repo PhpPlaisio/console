@@ -96,6 +96,31 @@ class AbcXmlHelper
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
+   * Returns all commands found in any abc.xml under the current project.
+   *
+   * @return string[]
+   */
+  public function findAbcCommands(): array
+  {
+    $commands = [];
+
+    $xpath = new \DOMXpath($this->xml);
+    $list  = $xpath->query('/abc/commands/command');
+    foreach ($list as $item)
+    {
+      /** @var \DOMElement $item */
+      $name            = $item->getAttribute('name');
+      $class           = $item->nodeValue;
+      $commands[$name] = function () use ($class) {
+        return new $class;
+      };
+    }
+
+    return $commands;
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
    * @return string
    */
   public function getStratumConfigFilename(): string
