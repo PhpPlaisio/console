@@ -5,6 +5,7 @@ namespace SetBased\Abc\Console\Command;
 use Composer\Factory;
 use Composer\IO\ConsoleIO;
 use SetBased\Abc\Console\Helper\AbcXmlHelper;
+use SetBased\Abc\Console\Style\AbcStyle;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -16,9 +17,16 @@ class StratumSourcesCommand extends Command
 {
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * The IO object.
+   * The Console IO object.
    *
    * @var ConsoleIO
+   */
+  private $consoleIo;
+
+  /**
+   * The output decorator.
+   *
+   * @var AbcStyle
    */
   private $io;
 
@@ -38,7 +46,8 @@ class StratumSourcesCommand extends Command
    */
   protected function execute(InputInterface $input, OutputInterface $output)
   {
-    $this->io = new ConsoleIO($input, $output, $this->getHelperSet());
+    $this->io        = new AbcStyle($input, $output);
+    $this->consoleIo = new ConsoleIO($input, $output, $this->getHelperSet());
 
     $patterns        = $this->findStratumSourcePatterns();
     $configFilename  = $this->stratumConfigFilename();
@@ -56,7 +65,7 @@ class StratumSourcesCommand extends Command
    */
   protected function saveSourcePatterns(string $sourcesFilename, array $patterns): void
   {
-    $this->io->notice(sprintf("Writing sources patterns to '%s'", $sourcesFilename));
+    $this->io->writeln(sprintf("Writing sources patterns to <fso>%s</fso>", $sourcesFilename));
 
     $content = implode(PHP_EOL, $patterns);
     $content .= PHP_EOL;
@@ -71,7 +80,7 @@ class StratumSourcesCommand extends Command
    */
   private function findStratumSourcePatterns(): array
   {
-    $composer = Factory::create($this->io);
+    $composer = Factory::create($this->consoleIo);
 
     $abcXmlList = AbcXmlHelper::getAbcXmlOfInstalledPackages($composer);
 
