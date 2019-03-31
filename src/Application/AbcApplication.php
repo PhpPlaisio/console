@@ -17,7 +17,7 @@ class AbcApplication extends Application
    */
   public function __construct()
   {
-    parent::__construct('ABC', '0.0.0');
+    parent::__construct('ABC', '0.1.6');
 
     $this->setCommandLoader(new CommandLoader(new BufferIO()));
   }

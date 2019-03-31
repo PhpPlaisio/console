@@ -19,7 +19,7 @@
         <!-- Set version of application -->
         <reflexive>
             <fileset dir=".">
-                <include name="src/Application/NahouwApplication.php"/>
+                <include name="src/Application/AbcApplication.php"/>
             </fileset>
             <filterchain>
                 <replaceregexp>
