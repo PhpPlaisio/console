@@ -2,7 +2,8 @@
   "name": "setbased/abc-console",
   "description": "ABC-Framework: Console",
   "keywords": [
-    "ABC-Framework"
+    "ABC-Framework",
+    "Console"
   ],
   "type": "library",
   "license": "MIT",
@@ -14,7 +15,8 @@
     "composer/composer": "^1.0.0"
   },
   "require-dev": {
-    "phing/phing": "^2.0.0"
+    "phing/phing": "^2.0.0",
+    "setbased/phing-extensions": "^2.1.0"
   },
   "autoload": {
     "psr-4": {
