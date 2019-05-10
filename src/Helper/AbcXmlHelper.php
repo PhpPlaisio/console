@@ -16,14 +16,14 @@ class AbcXmlHelper
    *
    * @var string
    */
-  private $path;
+  protected $path;
 
   /**
    * The XML of the abc.xml.
    *
    * @var \DOMDocument
    */
-  private $xml;
+  protected $xml;
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
