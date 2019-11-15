@@ -1,12 +1,12 @@
 <?php
 declare(strict_types=1);
 
-namespace SetBased\Abc\Console\Command;
+namespace Plaisio\Console\Command;
 
 use Composer\Factory;
 use Composer\IO\ConsoleIO;
-use SetBased\Abc\Console\Helper\AbcXmlHelper;
-use SetBased\Abc\Console\Style\AbcStyle;
+use Plaisio\Console\Helper\PlaisioXmlHelper;
+use Plaisio\Console\Style\PlaisioStyle;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -27,7 +27,7 @@ class StratumSourcesCommand extends Command
   /**
    * The output decorator.
    *
-   * @var AbcStyle
+   * @var PlaisioStyle
    */
   private $io;
 
@@ -37,7 +37,7 @@ class StratumSourcesCommand extends Command
    */
   protected function configure()
   {
-    $this->setName('abc:stratum-sources')
+    $this->setName('plaisio:stratum-sources')
          ->setDescription('Sets the stratum patterns for finding sources of stored routines');
   }
 
@@ -47,7 +47,7 @@ class StratumSourcesCommand extends Command
    */
   protected function execute(InputInterface $input, OutputInterface $output)
   {
-    $this->io        = new AbcStyle($input, $output);
+    $this->io        = new PlaisioStyle($input, $output);
     $this->consoleIo = new ConsoleIO($input, $output, $this->getHelperSet());
 
     $patterns        = $this->findStratumSourcePatterns();
@@ -83,18 +83,18 @@ class StratumSourcesCommand extends Command
   {
     $composer = Factory::create($this->consoleIo);
 
-    $abcXmlList = AbcXmlHelper::getAbcXmlOfInstalledPackages($composer);
+    $plaisioXmlList = PlaisioXmlHelper::getPlaisioXmlOfInstalledPackages($composer);
 
-    if (is_file('abc.xml'))
+    if (is_file('plaisio.xml'))
     {
-      $abcXmlList[] = 'abc.xml';
+      $plaisioXmlList[] = 'plaisio.xml';
     }
 
     $patterns = [];
-    foreach ($abcXmlList as $abcXmlPath)
+    foreach ($plaisioXmlList as $plaisioXmlPath)
     {
-      $packageRoot = dirname($abcXmlPath);
-      $helper      = new AbcXmlHelper($abcXmlPath);
+      $packageRoot = dirname($plaisioXmlPath);
+      $helper      = new PlaisioXmlHelper($plaisioXmlPath);
       $list        = $helper->getStratumSourcePatterns();
       foreach ($list as $item)
       {
@@ -151,13 +151,13 @@ class StratumSourcesCommand extends Command
    */
   private function stratumConfigFilename(): string
   {
-    $abcXmlPath = 'abc.xml';
-    if (!is_file($abcXmlPath))
+    $plaisioXmlPath = 'plaisio.xml';
+    if (!is_file($plaisioXmlPath))
     {
-      throw new \RuntimeException(sprintf('File %s not found', $abcXmlPath));
+      throw new \RuntimeException(sprintf('File %s not found', $plaisioXmlPath));
     }
 
-    $helper         = new AbcXmlHelper($abcXmlPath);
+    $helper         = new PlaisioXmlHelper($plaisioXmlPath);
     $configFilename = $helper->getStratumConfigFilename();
 
     return $configFilename;

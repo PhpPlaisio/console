@@ -1,15 +1,15 @@
 <?php
 declare(strict_types=1);
 
-namespace SetBased\Abc\Console\Application;
+namespace Plaisio\Console\Application;
 
 use Composer\Factory;
 use Composer\IO\ConsoleIO;
-use SetBased\Abc\Console\Helper\AbcXmlHelper;
+use Plaisio\Console\Helper\PlaisioXmlHelper;
 use Symfony\Component\Console\CommandLoader\FactoryCommandLoader;
 
 /**
- * Command loader for ABC commands.
+ * Command loader for Plaisio commands.
  */
 class CommandLoader extends FactoryCommandLoader
 {
@@ -22,6 +22,7 @@ class CommandLoader extends FactoryCommandLoader
   private $io;
 
   //--------------------------------------------------------------------------------------------------------------------
+
   /**
    * Object constructor.
    *
@@ -31,30 +32,30 @@ class CommandLoader extends FactoryCommandLoader
   {
     $this->io = $io;
 
-    parent::__construct($this->findAbcCommands());
+    parent::__construct($this->findPlaisioCommands());
   }
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * Returns the ABC commands in this projects.
+   * Returns the Plaisio commands in this projects.
    *
    * @return string[]
    */
-  private function findAbcCommands(): array
+  private function findPlaisioCommands(): array
   {
-    $composer   = Factory::create($this->io);
-    $abcXmlList = AbcXmlHelper::getAbcXmlOfInstalledPackages($composer);
+    $composer       = Factory::create($this->io);
+    $plaisioXmlList = PlaisioXmlHelper::getPlaisioXmlOfInstalledPackages($composer);
 
-    if (is_file('abc.xml'))
+    if (is_file('plaisio.xml'))
     {
-      $abcXmlList[] = 'abc.xml';
+      $plaisioXmlList[] = 'plaisio.xml';
     }
 
     $commands = [];
-    foreach ($abcXmlList as $abcXmlPath)
+    foreach ($plaisioXmlList as $plaisioXmlPath)
     {
-      $helper   = new AbcXmlHelper($abcXmlPath);
-      $commands = array_merge($commands, $helper->findAbcCommands());
+      $helper   = new PlaisioXmlHelper($plaisioXmlPath);
+      $commands = array_merge($commands, $helper->findPlaisioCommands());
     }
 
     return $commands;

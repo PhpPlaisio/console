@@ -1,30 +1,30 @@
 {
-  "name": "setbased/abc-console",
-  "description": "ABC-Framework: Console",
+  "name": "plaisio/console",
+  "description": "PhpPlaisio: Console",
   "keywords": [
-    "ABC-Framework",
+    "PhpPlaisio",
     "Console"
   ],
-  "type": "library",
   "license": "MIT",
   "require": {
     "php": ">=7.1.0",
     "ext-dom": "*",
     "ext-libxml": "*",
-    "symfony/console": "^3.0.0 || ^4.0.0",
+    "symfony/console": "^4.0.0",
     "composer/composer": "^1.0.0"
   },
   "require-dev": {
     "phing/phing": "^2.0.0",
+    "setbased/error-handler": "^1.1.0",
     "setbased/phing-extensions": "^2.1.0"
   },
   "autoload": {
     "psr-4": {
-      "SetBased\\Abc\\Console\\": "src/"
+      "Plaisio\\Console\\": "src/"
     }
   },
   "bin": [
-    "bin/abc"
+    "bin/plaisio"
   ],
   "config": {
     "bin-dir": "bin/"

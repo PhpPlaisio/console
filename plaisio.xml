@@ -1,0 +1,5 @@
+<plaisio>
+    <commands>
+        <command name="plaisio:stratum-sources">\Plaisio\Console\Command\StratumSourcesCommand</command>
+    </commands>
+</plaisio>

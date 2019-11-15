@@ -1,25 +1,25 @@
 <?php
 declare(strict_types=1);
 
-namespace SetBased\Abc\Console\Helper;
+namespace Plaisio\Console\Helper;
 
 use Composer\Composer;
 
 /**
- * Helper class for retrieving information about abc.xml files.
+ * Helper class for retrieving information about plaisio.xml files.
  */
-class AbcXmlHelper
+class PlaisioXmlHelper
 {
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * The path to the abc.xml file.
+   * The path to the plaisio.xml file.
    *
    * @var string
    */
   protected $path;
 
   /**
-   * The XML of the abc.xml.
+   * The XML of the plaisio.xml.
    *
    * @var \DOMDocument
    */
@@ -27,9 +27,9 @@ class AbcXmlHelper
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * AbcXmlHelper constructor.
+   * PlaisioXmlHelper constructor.
    *
-   * @param string $path The path to the abc.xml file.
+   * @param string $path The path to the plaisio.xml file.
    */
   public function __construct(string $path)
   {
@@ -45,13 +45,24 @@ class AbcXmlHelper
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * Returns a list of abc.xml files of all installed packages.
+   * The path to the plaisio.xml file.
+   *
+   * @return string
+   */
+  public function getPathOfPlaisioXml(): string
+  {
+    return $this->path;
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
+   * Returns a list of plaisio.xml files of all installed packages.
    *
    * @param Composer $composer The composer object.
    *
    * @return string[]
    */
-  public static function getAbcXmlOfInstalledPackages(Composer $composer): array
+  public static function getPlaisioXmlOfInstalledPackages(Composer $composer): array
   {
     $list = [];
 
@@ -63,7 +74,7 @@ class AbcXmlHelper
     foreach ($packages as $package)
     {
       $installPath = $installationManager->getInstallPath($package);
-      $path        = $installPath.DIRECTORY_SEPARATOR.'abc.xml';
+      $path        = $installPath.DIRECTORY_SEPARATOR.'plaisio.xml';
       if (is_file($path))
       {
         $list[$package->getName()] = self::relativePath($path);
@@ -97,16 +108,16 @@ class AbcXmlHelper
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * Returns all commands found in any abc.xml under the current project.
+   * Returns all commands found in any plaisio.xml under the current project.
    *
    * @return string[]
    */
-  public function findAbcCommands(): array
+  public function findPlaisioCommands(): array
   {
     $commands = [];
 
     $xpath = new \DOMXpath($this->xml);
-    $list  = $xpath->query('/abc/commands/command');
+    $list  = $xpath->query('/plaisio/commands/command');
     foreach ($list as $item)
     {
       /** @var \DOMElement $item */
@@ -127,7 +138,7 @@ class AbcXmlHelper
   public function getStratumConfigFilename(): string
   {
     $xpath = new \DOMXpath($this->xml);
-    $node  = $xpath->query('/abc/stratum/config')->item(0);
+    $node  = $xpath->query('/plaisio/stratum/config')->item(0);
 
     if ($node===null)
     {
@@ -148,7 +159,7 @@ class AbcXmlHelper
     $patterns = [];
 
     $xpath = new \DOMXpath($this->xml);
-    $list  = $xpath->query('/abc/stratum/includes/include');
+    $list  = $xpath->query('/plaisio/stratum/includes/include');
     foreach ($list as $item)
     {
       $patterns[] = $item->nodeValue;

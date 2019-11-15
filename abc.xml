@@ -1,5 +1,0 @@
-<abc>
-    <commands>
-        <command name="abc:stratum-sources">\SetBased\Abc\Console\Command\StratumSourcesCommand</command>
-    </commands>
-</abc>

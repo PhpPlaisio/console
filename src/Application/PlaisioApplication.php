@@ -1,23 +1,23 @@
 <?php
 declare(strict_types=1);
 
-namespace SetBased\Abc\Console\Application;
+namespace Plaisio\Console\Application;
 
 use Composer\IO\BufferIO;
 use Symfony\Component\Console\Application;
 
 /**
- * The ABC application.
+ * The Plaisio application.
  */
-class AbcApplication extends Application
+class PlaisioApplication extends Application
 {
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * AbcApplication constructor.
+   * PlaisioApplication constructor.
    */
   public function __construct()
   {
-    parent::__construct('ABC', '0.1.7');
+    parent::__construct('Plaisio', '0.1.7');
 
     $this->setCommandLoader(new CommandLoader(new BufferIO()));
   }

@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace SetBased\Abc\Console\Style;
+namespace Plaisio\Console\Style;
 
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Input\InputInterface;
@@ -11,7 +11,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /**
  * Output decorator helpers based on Symfony Style Guide.
  */
-class AbcStyle extends SymfonyStyle
+class PlaisioStyle extends SymfonyStyle
 {
   //--------------------------------------------------------------------------------------------------------------------
   /**
