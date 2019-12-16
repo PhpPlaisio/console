@@ -55,6 +55,8 @@ class StratumSourcesCommand extends Command
     $sourcesFilename = $this->sourcesListFilename($configFilename);
 
     $this->saveSourcePatterns($sourcesFilename, $patterns);
+
+    return 0;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
