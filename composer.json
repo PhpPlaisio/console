@@ -7,7 +7,7 @@
   ],
   "license": "MIT",
   "require": {
-    "php": ">=7.3.0",
+    "php": ">=7.3",
     "ext-dom": "*",
     "ext-libxml": "*",
     "composer/composer": "^1.0",
@@ -27,6 +27,7 @@
     "bin/plaisio"
   ],
   "config": {
-    "bin-dir": "bin/"
+    "bin-dir": "bin/",
+    "sort-packages": true
   }
 }
