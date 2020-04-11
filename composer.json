@@ -11,12 +11,12 @@
     "ext-dom": "*",
     "ext-libxml": "*",
     "composer/composer": "^1.0",
+    "setbased/error-handler": "^1.2",
     "setbased/typed-config": "^1.1",
     "symfony/console": "^5.0"
   },
   "require-dev": {
     "phing/phing": "^2.0",
-    "setbased/error-handler": "^1.1",
     "setbased/phing-extensions": "^2.1"
   },
   "autoload": {
