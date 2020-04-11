@@ -151,7 +151,7 @@ class DataLayerTypeAnnotationCommand extends Command
                                  strstr($lines[$index - 2], '@var', true),
                                  '\\'.ltrim($wrapperClass, '\\'));
 
-    return implode(PHP_EOL, $lines).PHP_EOL;
+    return implode(PHP_EOL, $lines);
   }
 
   //--------------------------------------------------------------------------------------------------------------------
