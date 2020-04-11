@@ -30,7 +30,7 @@ class DataLayerTypeAnnotationCommand extends Command
   /**
    * The declaration of the DataLayer.
    */
-  const PUBLIC_STATIC_DL = 'public static $dl;';
+  const PUBLIC_STATIC_DL = 'public static $DL;';
 
   /**
    * The Console IO object.
