@@ -51,6 +51,8 @@ class StratumSourcesCommand extends Command
     $this->io        = new PlaisioStyle($input, $output);
     $this->consoleIo = new ConsoleIO($input, $output, $this->getHelperSet());
 
+    $this->io->section('Plaisio: Stratum Sources');
+
     $patterns        = $this->findStratumSourcePatterns();
     $configFilename  = $this->stratumConfigFilename();
     $sourcesFilename = $this->sourcesListFilename($configFilename);
