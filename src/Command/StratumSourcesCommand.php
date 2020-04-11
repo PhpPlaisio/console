@@ -6,6 +6,7 @@ namespace Plaisio\Console\Command;
 use Composer\Factory;
 use Composer\IO\ConsoleIO;
 use Plaisio\Console\Helper\PlaisioXmlHelper;
+use Plaisio\Console\Helper\TwoPhaseWrite;
 use Plaisio\Console\Style\PlaisioStyle;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -68,11 +69,11 @@ class StratumSourcesCommand extends Command
    */
   protected function saveSourcePatterns(string $sourcesFilename, array $patterns): void
   {
-    $this->io->writeln(sprintf("Writing sources patterns to <fso>%s</fso>", $sourcesFilename));
-
     $content = implode(PHP_EOL, $patterns);
     $content .= PHP_EOL;
-    file_put_contents($sourcesFilename, $content);
+
+    $helper = new TwoPhaseWrite($this->io);
+    $helper->write($sourcesFilename, $content);
   }
 
   //--------------------------------------------------------------------------------------------------------------------
