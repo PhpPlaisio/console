@@ -11,6 +11,7 @@
     "ext-dom": "*",
     "ext-libxml": "*",
     "composer/composer": "^1.0",
+    "setbased/typed-config": "^1.1",
     "symfony/console": "^5.0"
   },
   "require-dev": {
