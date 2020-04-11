@@ -159,10 +159,9 @@ class StratumSourcesCommand extends Command
       throw new \RuntimeException(sprintf('File %s not found', $plaisioXmlPath));
     }
 
-    $helper         = new PlaisioXmlHelper($plaisioXmlPath);
-    $configFilename = $helper->getStratumConfigFilename();
+    $helper = new PlaisioXmlHelper($plaisioXmlPath);
 
-    return $configFilename;
+    return $helper->getStratumConfigFilename();
   }
 
   //--------------------------------------------------------------------------------------------------------------------
