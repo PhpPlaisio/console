@@ -147,7 +147,9 @@ class DataLayerTypeAnnotationCommand extends Command
       throw new \RuntimeException(sprintf('Annotation of the DataLayer not found in %s', $nubPath));
     }
 
-    $lines[$index - 2] = sprintf('%s@var %s', strstr($lines[$index - 2], '@var', true), $wrapperClass);
+    $lines[$index - 2] = sprintf('%s@var %s',
+                                 strstr($lines[$index - 2], '@var', true),
+                                 '\\'.ltrim($wrapperClass, '\\'));
 
     return implode(PHP_EOL, $lines).PHP_EOL;
   }
