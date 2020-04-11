@@ -22,7 +22,6 @@ class CommandLoader extends FactoryCommandLoader
   private $io;
 
   //--------------------------------------------------------------------------------------------------------------------
-
   /**
    * Object constructor.
    *
