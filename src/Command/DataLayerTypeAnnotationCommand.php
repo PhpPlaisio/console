@@ -46,7 +46,7 @@ class DataLayerTypeAnnotationCommand extends PlaisioCommand
    */
   protected function execute(InputInterface $input, OutputInterface $output)
   {
-    $this->io->section('Plaisio: DataLayer Type Annotation');
+    $this->io->title('Plaisio: DataLayer Type Annotation');
 
     $wrapperClass = $input->getArgument('class');
     if ($wrapperClass===null)

@@ -30,7 +30,7 @@ class StratumSourcesCommand extends PlaisioCommand
    */
   protected function execute(InputInterface $input, OutputInterface $output)
   {
-    $this->io->section('Plaisio: Stratum Sources');
+    $this->io->title('Plaisio: Stratum Sources');
 
     $patterns        = $this->findStratumSourcePatterns();
     $configFilename  = $this->stratumConfigFilename();
