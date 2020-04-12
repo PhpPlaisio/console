@@ -4,14 +4,11 @@ declare(strict_types=1);
 namespace Plaisio\Console\Command;
 
 use Composer\Autoload\ClassLoader;
-use Composer\IO\ConsoleIO;
 use Noodlehaus\Config;
 use Plaisio\Console\Helper\PlaisioXmlHelper;
 use Plaisio\Console\Helper\TwoPhaseWrite;
-use Plaisio\Console\Style\PlaisioStyle;
 use SetBased\Config\TypedConfig;
 use SetBased\Exception\RuntimeException;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -19,7 +16,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Command for collecting source patterns for finding stored routines provided by packages.
  */
-class DataLayerTypeAnnotationCommand extends Command
+class DataLayerTypeAnnotationCommand extends PlaisioCommand
 {
   //--------------------------------------------------------------------------------------------------------------------
   /**
@@ -31,20 +28,6 @@ class DataLayerTypeAnnotationCommand extends Command
    * The declaration of the DataLayer.
    */
   const PUBLIC_STATIC_DL = 'public static $DL;';
-
-  /**
-   * The Console IO object.
-   *
-   * @var ConsoleIO
-   */
-  private $consoleIo;
-
-  /**
-   * The output decorator.
-   *
-   * @var PlaisioStyle
-   */
-  private $io;
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
@@ -63,9 +46,6 @@ class DataLayerTypeAnnotationCommand extends Command
    */
   protected function execute(InputInterface $input, OutputInterface $output)
   {
-    $this->io        = new PlaisioStyle($input, $output);
-    $this->consoleIo = new ConsoleIO($input, $output, $this->getHelperSet());
-
     $this->io->section('Plaisio: DataLayer Type Annotation');
 
     $wrapperClass = $input->getArgument('class');

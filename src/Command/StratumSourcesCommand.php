@@ -4,34 +4,16 @@ declare(strict_types=1);
 namespace Plaisio\Console\Command;
 
 use Composer\Factory;
-use Composer\IO\ConsoleIO;
 use Plaisio\Console\Helper\PlaisioXmlHelper;
 use Plaisio\Console\Helper\TwoPhaseWrite;
-use Plaisio\Console\Style\PlaisioStyle;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Command for collecting source patterns for finding stored routines provided by packages.
  */
-class StratumSourcesCommand extends Command
+class StratumSourcesCommand extends PlaisioCommand
 {
-  //--------------------------------------------------------------------------------------------------------------------
-  /**
-   * The Console IO object.
-   *
-   * @var ConsoleIO
-   */
-  private $consoleIo;
-
-  /**
-   * The output decorator.
-   *
-   * @var PlaisioStyle
-   */
-  private $io;
-
   //--------------------------------------------------------------------------------------------------------------------
   /**
    * @inheritdoc
@@ -48,9 +30,6 @@ class StratumSourcesCommand extends Command
    */
   protected function execute(InputInterface $input, OutputInterface $output)
   {
-    $this->io        = new PlaisioStyle($input, $output);
-    $this->consoleIo = new ConsoleIO($input, $output, $this->getHelperSet());
-
     $this->io->section('Plaisio: Stratum Sources');
 
     $patterns        = $this->findStratumSourcePatterns();
