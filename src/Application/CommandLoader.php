@@ -42,7 +42,7 @@ class CommandLoader extends FactoryCommandLoader
    */
   private function findPlaisioCommands(): array
   {
-    $composer       = Factory::create($this->io);
+    $composer       = Factory::create($this->io, []);
     $plaisioXmlList = PlaisioXmlHelper::getPlaisioXmlOfInstalledPackages($composer);
 
     if (is_file('plaisio.xml'))

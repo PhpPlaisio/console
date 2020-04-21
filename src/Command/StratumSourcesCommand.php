@@ -65,7 +65,7 @@ class StratumSourcesCommand extends PlaisioCommand
    */
   private function findStratumSourcePatterns(): array
   {
-    $composer = Factory::create($this->consoleIo);
+    $composer = Factory::create($this->consoleIo, []);
 
     $plaisioXmlList = PlaisioXmlHelper::getPlaisioXmlOfInstalledPackages($composer);
 
