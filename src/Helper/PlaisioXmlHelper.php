@@ -55,7 +55,7 @@ class PlaisioXmlHelper
   {
     $list = self::getPlaisioXmlOfInstalledPackages($vendorDir);
 
-    $plaisioConfigPath = $_ENV['PLAISIO_CONFIG'] ?? dirname($vendorDir).'/plaisio.xml';
+    $plaisioConfigPath = self::plaisioXmlPath($vendorDir);
     if (is_file($plaisioConfigPath))
     {
       $list[] = $plaisioConfigPath;
@@ -103,15 +103,27 @@ class PlaisioXmlHelper
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
+   * Returns the path to the plaisio.xml file.
+   *
+   * @param string $vendorDir The path to the vendor directory.
+   *
+   * @return string
+   */
+  public static function plaisioXmlPath($vendorDir): string
+  {
+    return $_ENV['PLAISIO_CONFIG'] ?? dirname($vendorDir).'/plaisio.xml';
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
    * Returns the path to the vendor directory.
    *
    * @return string
    */
   public static function vendorDir(): string
   {
-    return dirname(dirname(dirname(dirname(__DIR__))));
+    return self::relativePath(dirname(dirname(dirname(dirname(__DIR__)))));
   }
-
   //--------------------------------------------------------------------------------------------------------------------
   /**
    * Returns the relative path of path if the path is below the cwd. Otherwise returns the path unmodified.
