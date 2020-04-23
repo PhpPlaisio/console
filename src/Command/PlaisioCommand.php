@@ -9,7 +9,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- *  Abstract parent command for all Plaisio commands.
+ * Abstract parent command for all Plaisio commands.
  */
 abstract class PlaisioCommand extends Command
 {
