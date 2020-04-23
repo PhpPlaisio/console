@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Plaisio\Console\Command;
 
-use Composer\IO\ConsoleIO;
 use Plaisio\Console\Style\PlaisioStyle;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -15,13 +14,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 abstract class PlaisioCommand extends Command
 {
   //--------------------------------------------------------------------------------------------------------------------
-  /**
-   * The Console IO object.
-   *
-   * @var ConsoleIO
-   */
-  protected $consoleIo;
-
   /**
    * The output decorator.
    *
@@ -38,8 +30,7 @@ abstract class PlaisioCommand extends Command
    */
   protected function initialize(InputInterface $input, OutputInterface $output)
   {
-    $this->io        = new PlaisioStyle($input, $output);
-    $this->consoleIo = new ConsoleIO($input, $output, $this->getHelperSet());
+    $this->io = new PlaisioStyle($input, $output);
   }
 
   //--------------------------------------------------------------------------------------------------------------------
