@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Plaisio\Console\Command;
 
-use Composer\Factory;
 use Plaisio\Console\Helper\PlaisioXmlHelper;
 use Plaisio\Console\Helper\TwoPhaseWrite;
 use Symfony\Component\Console\Input\InputInterface;
@@ -65,20 +64,14 @@ class StratumSourcesCommand extends PlaisioCommand
    */
   private function findStratumSourcePatterns(): array
   {
-    $composer = Factory::create($this->consoleIo, []);
-
-    $plaisioXmlList = PlaisioXmlHelper::getPlaisioXmlOfInstalledPackages($composer);
-
-    if (is_file('plaisio.xml'))
-    {
-      $plaisioXmlList[] = 'plaisio.xml';
-    }
+    $vendorDir      = PlaisioXmlHelper::vendorDir();
+    $plaisioXmlList = PlaisioXmlHelper::getAllPlaisioXml($vendorDir);
 
     $patterns = [];
-    foreach ($plaisioXmlList as $plaisioXmlPath)
+    foreach ($plaisioXmlList as $plaisioConfigPath)
     {
-      $packageRoot = dirname($plaisioXmlPath);
-      $helper      = new PlaisioXmlHelper($plaisioXmlPath);
+      $packageRoot = dirname($plaisioConfigPath);
+      $helper      = new PlaisioXmlHelper($plaisioConfigPath);
       $list        = $helper->getStratumSourcePatterns();
       foreach ($list as $item)
       {
@@ -135,13 +128,13 @@ class StratumSourcesCommand extends PlaisioCommand
    */
   private function stratumConfigFilename(): string
   {
-    $plaisioXmlPath = 'plaisio.xml';
-    if (!is_file($plaisioXmlPath))
+    $plaisioConfigPath = 'plaisio.xml';
+    if (!is_file($plaisioConfigPath))
     {
-      throw new \RuntimeException(sprintf('File %s not found', $plaisioXmlPath));
+      throw new \RuntimeException(sprintf('File %s not found', $plaisioConfigPath));
     }
 
-    $helper = new PlaisioXmlHelper($plaisioXmlPath);
+    $helper = new PlaisioXmlHelper($plaisioConfigPath);
 
     return $helper->getStratumConfigFilename();
   }

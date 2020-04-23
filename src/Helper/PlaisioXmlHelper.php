@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Plaisio\Console\Helper;
 
-use Composer\Composer;
+use DirectoryIterator;
 
 /**
  * Helper class for retrieving information about plaisio.xml files.
@@ -45,45 +45,71 @@ class PlaisioXmlHelper
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * The path to the plaisio.xml file.
+   * Returns a list of plaisio.xml files of all installed packages and of the current project.
    *
-   * @return string
+   * @param string $vendorDir Path to vendor directory.
+   *
+   * @return string[]
    */
-  public function getPathOfPlaisioXml(): string
+  public static function getAllPlaisioXml(string $vendorDir): array
   {
-    return $this->path;
+    $list = self::getPlaisioXmlOfInstalledPackages($vendorDir);
+
+    $plaisioConfigPath = $_ENV['PLAISIO_CONFIG'] ?? dirname($vendorDir).'/plaisio.xml';
+    if (is_file($plaisioConfigPath))
+    {
+      $list[] = $plaisioConfigPath;
+    }
+
+    return $list;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
    * Returns a list of plaisio.xml files of all installed packages.
    *
-   * @param Composer $composer The composer object.
+   * @param string $vendorDir Path to vendor directory.
    *
    * @return string[]
    */
-  public static function getPlaisioXmlOfInstalledPackages(Composer $composer): array
+  public static function getPlaisioXmlOfInstalledPackages(string $vendorDir): array
   {
     $list = [];
 
-    $repositoryManager   = $composer->getRepositoryManager();
-    $installationManager = $composer->getInstallationManager();
-    $localRepository     = $repositoryManager->getLocalRepository();
-
-    $packages = $localRepository->getPackages();
-    foreach ($packages as $package)
+    $directories1 = new DirectoryIterator($vendorDir);
+    foreach ($directories1 as $item1)
     {
-      $installPath = $installationManager->getInstallPath($package);
-      $path        = $installPath.DIRECTORY_SEPARATOR.'plaisio.xml';
-      if (is_file($path))
+      if ($item1->isDir() && !$item1->isDot())
       {
-        $list[$package->getName()] = self::relativePath($path);
+        $directories2 = new DirectoryIterator($item1->getPathname());
+        foreach ($directories2 as $item2)
+        {
+          if ($item2->isDir() && !$item2->isDot())
+          {
+            $path = $item2->getPathname().DIRECTORY_SEPARATOR.'plaisio.xml';
+            if (is_file($path))
+            {
+              $list[] = self::relativePath($path);
+            }
+          }
+        }
       }
     }
 
-    asort($list);
+    sort($list);
 
     return $list;
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
+   * Returns the path to the vendor directory.
+   *
+   * @return string
+   */
+  public static function vendorDir(): string
+  {
+    return dirname(dirname(dirname(dirname(__DIR__))));
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -110,7 +136,7 @@ class PlaisioXmlHelper
   /**
    * Returns all commands found in any plaisio.xml under the current project.
    *
-   * @return string[]
+   * @return array
    */
   public function findPlaisioCommands(): array
   {
@@ -129,6 +155,17 @@ class PlaisioXmlHelper
     }
 
     return $commands;
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
+   * The path to the plaisio.xml file.
+   *
+   * @return string
+   */
+  public function getPathOfPlaisioXml(): string
+  {
+    return $this->path;
   }
 
   //--------------------------------------------------------------------------------------------------------------------

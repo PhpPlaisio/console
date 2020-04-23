@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Plaisio\Console\Application;
 
-use Composer\IO\BufferIO;
 use Symfony\Component\Console\Application;
 
 /**
@@ -19,7 +18,7 @@ class PlaisioApplication extends Application
   {
     parent::__construct('Plaisio', '0.2.12');
 
-    $this->setCommandLoader(new CommandLoader(new BufferIO()));
+    $this->setCommandLoader(new CommandLoader());
   }
 
   //--------------------------------------------------------------------------------------------------------------------

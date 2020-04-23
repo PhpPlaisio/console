@@ -142,13 +142,13 @@ class DataLayerTypeAnnotationCommand extends PlaisioCommand
    */
   private function stratumConfigFilename(): string
   {
-    $plaisioXmlPath = 'plaisio.xml';
-    if (!is_file($plaisioXmlPath))
+    $plaisioConfigPath = 'plaisio.xml';
+    if (!is_file($plaisioConfigPath))
     {
-      throw new \RuntimeException(sprintf('File %s not found', $plaisioXmlPath));
+      throw new \RuntimeException(sprintf('File %s not found', $plaisioConfigPath));
     }
 
-    $helper = new PlaisioXmlHelper($plaisioXmlPath);
+    $helper = new PlaisioXmlHelper($plaisioConfigPath);
 
     return $helper->getStratumConfigFilename();
   }
