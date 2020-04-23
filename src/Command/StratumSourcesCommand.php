@@ -64,15 +64,14 @@ class StratumSourcesCommand extends PlaisioCommand
    */
   private function findStratumSourcePatterns(): array
   {
-    $vendorDir      = PlaisioXmlHelper::vendorDir();
-    $plaisioXmlList = PlaisioXmlHelper::getAllPlaisioXml($vendorDir);
+    $plaisioXmlList = PlaisioXmlHelper::findPlaisioXmlAll();
 
     $patterns = [];
     foreach ($plaisioXmlList as $plaisioConfigPath)
     {
       $packageRoot = dirname($plaisioConfigPath);
       $helper      = new PlaisioXmlHelper($plaisioConfigPath);
-      $list        = $helper->getStratumSourcePatterns();
+      $list        = $helper->queryStratumSourcePatterns();
       foreach ($list as $item)
       {
         $patterns[] = (($packageRoot!='.') ? $packageRoot.'/' : '').$item;
@@ -136,7 +135,7 @@ class StratumSourcesCommand extends PlaisioCommand
 
     $helper = new PlaisioXmlHelper($plaisioConfigPath);
 
-    return $helper->getStratumConfigFilename();
+    return $helper->queryStratumConfigFilename();
   }
 
   //--------------------------------------------------------------------------------------------------------------------

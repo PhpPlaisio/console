@@ -29,14 +29,14 @@ class PlaisioXmlHelper
   /**
    * PlaisioXmlHelper constructor.
    *
-   * @param string $path The path to the plaisio.xml file.
+   * @param string|null $path The path to plaisio.xml. If null the plaisio.xml of the current project will be used.
    */
-  public function __construct(string $path)
+  public function __construct(?string $path = null)
   {
-    $this->path = $path;
+    $this->path = $path ?? self::plaisioXmlPath();
 
     $this->xml = new \DOMDocument();
-    $success   = $this->xml->load($path, LIBXML_NOWARNING);
+    $success   = $this->xml->load($this->path, LIBXML_NOWARNING);
     if (!$success)
     {
       throw new \RuntimeException('Unable to parse the XML file.');
@@ -47,15 +47,13 @@ class PlaisioXmlHelper
   /**
    * Returns a list of plaisio.xml files of all installed packages and of the current project.
    *
-   * @param string $vendorDir Path to vendor directory.
-   *
    * @return string[]
    */
-  public static function getAllPlaisioXml(string $vendorDir): array
+  public static function findPlaisioXmlAll(): array
   {
-    $list = self::getPlaisioXmlOfInstalledPackages($vendorDir);
+    $list = self::findPlaisioXmlPackages();
 
-    $plaisioConfigPath = self::plaisioXmlPath($vendorDir);
+    $plaisioConfigPath = self::plaisioXmlPath();
     if (is_file($plaisioConfigPath))
     {
       $list[] = $plaisioConfigPath;
@@ -68,15 +66,13 @@ class PlaisioXmlHelper
   /**
    * Returns a list of plaisio.xml files of all installed packages.
    *
-   * @param string $vendorDir Path to vendor directory.
-   *
    * @return string[]
    */
-  public static function getPlaisioXmlOfInstalledPackages(string $vendorDir): array
+  public static function findPlaisioXmlPackages(): array
   {
     $list = [];
 
-    $directories1 = new DirectoryIterator($vendorDir);
+    $directories1 = new DirectoryIterator(self::vendorDir());
     foreach ($directories1 as $item1)
     {
       if ($item1->isDir() && !$item1->isDot())
@@ -103,15 +99,13 @@ class PlaisioXmlHelper
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * Returns the path to the plaisio.xml file.
-   *
-   * @param string $vendorDir The path to the vendor directory.
+   * Returns the path to plaisio.xml of the current project.
    *
    * @return string
    */
-  public static function plaisioXmlPath($vendorDir): string
+  public static function plaisioXmlPath(): string
   {
-    return $_ENV['PLAISIO_CONFIG'] ?? dirname($vendorDir).'/plaisio.xml';
+    return $_ENV['PLAISIO_CONFIG'] ?? dirname(self::vendorDir()).'/plaisio.xml';
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -124,6 +118,7 @@ class PlaisioXmlHelper
   {
     return self::relativePath(dirname(dirname(dirname(dirname(__DIR__)))));
   }
+
   //--------------------------------------------------------------------------------------------------------------------
   /**
    * Returns the relative path of path if the path is below the cwd. Otherwise returns the path unmodified.
@@ -146,11 +141,22 @@ class PlaisioXmlHelper
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
+   * Returns the path to plaisio.xml.
+   *
+   * @return string
+   */
+  public function path(): string
+  {
+    return $this->path;
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
    * Returns all commands found in any plaisio.xml under the current project.
    *
    * @return array
    */
-  public function findPlaisioCommands(): array
+  public function queryPlaisioCommands(): array
   {
     $commands = [];
 
@@ -171,20 +177,9 @@ class PlaisioXmlHelper
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * The path to the plaisio.xml file.
-   *
    * @return string
    */
-  public function getPathOfPlaisioXml(): string
-  {
-    return $this->path;
-  }
-
-  //--------------------------------------------------------------------------------------------------------------------
-  /**
-   * @return string
-   */
-  public function getStratumConfigFilename(): string
+  public function queryStratumConfigFilename(): string
   {
     $xpath = new \DOMXpath($this->xml);
     $node  = $xpath->query('/plaisio/stratum/config')->item(0);
@@ -203,7 +198,7 @@ class PlaisioXmlHelper
    *
    * @return string[]
    */
-  public function getStratumSourcePatterns(): array
+  public function queryStratumSourcePatterns(): array
   {
     $patterns = [];
 

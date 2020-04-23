@@ -28,14 +28,13 @@ class CommandLoader extends FactoryCommandLoader
    */
   private function findPlaisioCommands(): array
   {
-    $vendorDir      = PlaisioXmlHelper::vendorDir();
-    $plaisioXmlList = PlaisioXmlHelper::getAllPlaisioXml($vendorDir);
+    $plaisioXmlList = PlaisioXmlHelper::findPlaisioXmlAll();
 
     $commands = [];
     foreach ($plaisioXmlList as $path)
     {
       $helper   = new PlaisioXmlHelper($path);
-      $commands = array_merge($commands, $helper->findPlaisioCommands());
+      $commands = array_merge($commands, $helper->queryPlaisioCommands());
     }
 
     return $commands;
