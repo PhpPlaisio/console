@@ -4,14 +4,16 @@ declare(strict_types=1);
 namespace Plaisio\Console\Command;
 
 use Plaisio\Console\Helper\PlaisioXmlHelper;
+use Plaisio\Console\Helper\PlaisioXmlUtility;
 use Plaisio\Console\Helper\TwoPhaseWrite;
+use SetBased\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Command for collecting source patterns for finding stored routines provided by packages.
  */
-class StratumSourcesCommand extends PlaisioCommand
+class PhpStratumSourcesCommand extends PlaisioCommand
 {
   //--------------------------------------------------------------------------------------------------------------------
   /**
@@ -19,8 +21,8 @@ class StratumSourcesCommand extends PlaisioCommand
    */
   protected function configure()
   {
-    $this->setName('plaisio:stratum-sources')
-         ->setDescription('Sets the stratum patterns for finding sources of stored routines');
+    $this->setName('plaisio:php-stratum-sources')
+         ->setDescription('Sets the PhpStratum patterns for finding sources of stored routines');
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -29,10 +31,10 @@ class StratumSourcesCommand extends PlaisioCommand
    */
   protected function execute(InputInterface $input, OutputInterface $output)
   {
-    $this->io->title('Plaisio: Stratum Sources');
+    $this->io->title('Plaisio: PhpStratum Sources');
 
-    $patterns        = $this->findStratumSourcePatterns();
-    $configFilename  = $this->stratumConfigFilename();
+    $patterns        = $this->findPhpStratumSourcePatterns();
+    $configFilename  = $this->phpStratumConfigFilename();
     $sourcesFilename = $this->sourcesListFilename($configFilename);
 
     $this->saveSourcePatterns($sourcesFilename, $patterns);
@@ -42,10 +44,10 @@ class StratumSourcesCommand extends PlaisioCommand
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * Saves the Stratum sources patterns to a file.
+   * Saves the PhpStratum sources patterns to a file.
    *
    * @param string   $sourcesFilename The name of the file.
-   * @param string[] $patterns        The Stratum sources patterns.
+   * @param string[] $patterns        The PhpStratum sources patterns.
    */
   protected function saveSourcePatterns(string $sourcesFilename, array $patterns): void
   {
@@ -58,20 +60,20 @@ class StratumSourcesCommand extends PlaisioCommand
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * Returns the Stratum sources patterns for this project.
+   * Returns the PhpStratum sources patterns for this project.
    *
    * @return string[]
    */
-  private function findStratumSourcePatterns(): array
+  private function findPhpStratumSourcePatterns(): array
   {
-    $plaisioXmlList = PlaisioXmlHelper::findPlaisioXmlAll();
+    $plaisioXmlList = PlaisioXmlUtility::findPlaisioXmlAll();
 
     $patterns = [];
     foreach ($plaisioXmlList as $plaisioConfigPath)
     {
       $packageRoot = dirname($plaisioConfigPath);
       $helper      = new PlaisioXmlHelper($plaisioConfigPath);
-      $list        = $helper->queryStratumSourcePatterns();
+      $list        = $helper->queryPhpStratumSourcePatterns();
       foreach ($list as $item)
       {
         $patterns[] = (($packageRoot!='.') ? $packageRoot.'/' : '').$item;
@@ -85,9 +87,22 @@ class StratumSourcesCommand extends PlaisioCommand
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
+   * Returns the name of the phpStratum configuration file.
+   *
+   * @return string
+   */
+  private function phpStratumConfigFilename(): string
+  {
+    $helper = new PlaisioXmlHelper();
+
+    return $helper->queryPhpStratumConfigFilename();
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
    * Returns the name of the file for storing the list of patterns for sources of stored routines.
    *
-   * @param string $configFilename The name Stratum configuration file.
+   * @param string $configFilename The name PhpStratum configuration file.
    *
    * @return string
    */
@@ -97,45 +112,26 @@ class StratumSourcesCommand extends PlaisioCommand
 
     if (!isset($settings['loader']['sources']))
     {
-      throw new \RuntimeException(sprintf("Setting '%s' not found in section '%s' in file '%s'",
-                                          'sources',
-                                          'loader',
-                                          $configFilename));
+      throw new RuntimeException("Setting '%s' not found in section '%s' in file '%s'",
+                                 'sources',
+                                 'loader',
+                                 $configFilename);
     }
 
     $sources = $settings['loader']['sources'];
 
     if (substr($sources, 0, 5)!='file:')
     {
-      throw new \RuntimeException(sprintf("Setting '%s' in section '%s' in file '%s' must have format 'file:<filename>'",
-                                          'sources',
-                                          'loader',
-                                          $configFilename));
+      throw new RuntimeException("Setting '%s' in section '%s' in file '%s' must have format 'file:<filename>'",
+                                 'sources',
+                                 'loader',
+                                 $configFilename);
     }
 
     $basedir = dirname($configFilename);
     $path    = substr($sources, 5);
 
     return $basedir.'/'.$path;
-  }
-
-  //--------------------------------------------------------------------------------------------------------------------
-  /**
-   * Returns the name of the Stratum configuration file.
-   *
-   * @return string
-   */
-  private function stratumConfigFilename(): string
-  {
-    $plaisioConfigPath = 'plaisio.xml';
-    if (!is_file($plaisioConfigPath))
-    {
-      throw new \RuntimeException(sprintf('File %s not found', $plaisioConfigPath));
-    }
-
-    $helper = new PlaisioXmlHelper($plaisioConfigPath);
-
-    return $helper->queryStratumConfigFilename();
   }
 
   //--------------------------------------------------------------------------------------------------------------------

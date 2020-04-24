@@ -1,6 +1,6 @@
 <plaisio>
     <commands>
-        <command name="plaisio:stratum-sources">\Plaisio\Console\Command\StratumSourcesCommand</command>
+        <command name="plaisio:stratum-sources">\Plaisio\Console\Command\PhpStratumSourcesCommand</command>
         <command name="plaisio:data-layer-type-annotation">\Plaisio\Console\Command\DataLayerTypeAnnotationCommand</command>
     </commands>
 </plaisio>

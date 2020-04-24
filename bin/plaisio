@@ -6,16 +6,16 @@ use Plaisio\Console\Application\PlaisioApplication;
 use SetBased\ErrorHandler\ErrorHandler;
 
 //----------------------------------------------------------------------------------------------------------------------
-$files = [__DIR__.'/../../../../vendor/autoload.php',
-          __DIR__.'/../../../vendor/autoload.php',
+$files = [__DIR__.'/../vendor/autoload.php',
           __DIR__.'/../../vendor/autoload.php',
-          __DIR__.'/../vendor/autoload.php'];
+          __DIR__.'/../../../vendor/autoload.php',
+          __DIR__.'/../../../../vendor/autoload.php'];
 
 foreach ($files as $file)
 {
   if (file_exists($file))
   {
-   require $file;
+    require $file;
     break;
   }
 }

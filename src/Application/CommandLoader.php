@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Plaisio\Console\Application;
 
 use Plaisio\Console\Helper\PlaisioXmlHelper;
+use Plaisio\Console\Helper\PlaisioXmlUtility;
 use Symfony\Component\Console\CommandLoader\FactoryCommandLoader;
 
 /**
@@ -22,13 +23,13 @@ class CommandLoader extends FactoryCommandLoader
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * Returns the Plaisio commands in this projects.
+   * Returns the Plaisio commands in this project.
    *
    * @return array
    */
   private function findPlaisioCommands(): array
   {
-    $plaisioXmlList = PlaisioXmlHelper::findPlaisioXmlAll();
+    $plaisioXmlList = PlaisioXmlUtility::findPlaisioXmlAll();
 
     $commands = [];
     foreach ($plaisioXmlList as $path)

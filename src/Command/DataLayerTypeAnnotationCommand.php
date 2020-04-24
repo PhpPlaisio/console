@@ -51,7 +51,7 @@ class DataLayerTypeAnnotationCommand extends PlaisioCommand
     $wrapperClass = $input->getArgument('class');
     if ($wrapperClass===null)
     {
-      $configFilename = $this->stratumConfigFilename();
+      $configFilename = $this->phpStratumConfigFilename();
       $wrapperClass   = $this->wrapperClass($configFilename);
     }
     $nubPath = $this->classPath(self::PLAISIO_KERNEL_NUB);
@@ -80,7 +80,7 @@ class DataLayerTypeAnnotationCommand extends PlaisioCommand
     $filename = $loader->findFile(ltrim($class, '\\'));
     if ($filename===false)
     {
-      throw new RuntimeException("ClassLoader can not find class '%s'.", $class);
+      throw new RuntimeException("ClassLoader can not find class '%s'", $class);
     }
 
     return realpath($filename);
@@ -124,7 +124,7 @@ class DataLayerTypeAnnotationCommand extends PlaisioCommand
 
     if ($index<=4 || substr(trim($lines[$index - 2]), 0, 6)!=='* @var')
     {
-      throw new \RuntimeException(sprintf('Annotation of the DataLayer not found in %s', $nubPath));
+      throw new RuntimeException('Annotation of the DataLayer not found in %s', $nubPath);
     }
 
     $lines[$index - 2] = sprintf('%s@var %s',
@@ -136,22 +136,22 @@ class DataLayerTypeAnnotationCommand extends PlaisioCommand
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * Returns the name of the Stratum configuration file.
+   * Returns the name of the PhpStratum configuration file.
    *
    * @return string
    */
-  private function stratumConfigFilename(): string
+  private function phpStratumConfigFilename(): string
   {
     $helper = new PlaisioXmlHelper();
 
-    return $helper->queryStratumConfigFilename();
+    return $helper->queryPhpStratumConfigFilename();
   }
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * Extracts the wrapper class name from the Stratum configuration file.
+   * Extracts the wrapper class name from the PhpStratum configuration file.
    *
-   * @param string $configFilename The name of the Stratum configuration file.
+   * @param string $configFilename The name of the PhpStratum configuration file.
    *
    * @return string
    */

@@ -54,7 +54,7 @@ class TwoPhaseWrite
     if (file_exists($filename))
     {
       $currentContent = file_get_contents($filename);
-      $flag  = ($content!==$currentContent);
+      $flag           = ($content!==$currentContent);
 
       if ($flag)
       {

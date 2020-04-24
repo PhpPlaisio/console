@@ -11,6 +11,7 @@
     "ext-dom": "*",
     "ext-libxml": "*",
     "setbased/error-handler": "^1.2",
+    "setbased/exception": "^2.1",
     "setbased/typed-config": "^1.1",
     "symfony/console": "^5.0"
   },
