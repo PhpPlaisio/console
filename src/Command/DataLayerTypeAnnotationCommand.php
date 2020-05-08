@@ -8,6 +8,7 @@ use Noodlehaus\Config;
 use Plaisio\Console\Helper\PlaisioXmlHelper;
 use Plaisio\Console\Helper\TwoPhaseWrite;
 use SetBased\Config\TypedConfig;
+use SetBased\Exception\FallenException;
 use SetBased\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -25,9 +26,14 @@ class DataLayerTypeAnnotationCommand extends PlaisioCommand
   const PLAISIO_KERNEL_NUB = '\\Plaisio\\Kernel\\Nub';
 
   /**
-   * The declaration of the DataLayer.
+   * The declaration of the DataLayer, kernel 1.x.
    */
-  const PUBLIC_STATIC_DL = 'public static $DL;';
+  const PUBLIC_STATIC_DL1 = 'public static $DL;';
+
+  /**
+   * The declaration of the DataLayer, kernel 2.x.
+   */
+  const PUBLIC_STATIC_DL2 = '/(?P<property>.*@property-read) (?P<class>.+) (?P<dl>\$DL) (?P<comment>.*)$/';
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
@@ -92,15 +98,20 @@ class DataLayerTypeAnnotationCommand extends PlaisioCommand
    *
    * @param string[] $lines The source of \Plaisio\Kernel\Nub as lines.
    *
-   * @return int
+   * @return array
    */
-  private function declarationOfDataLayer(array $lines): int
+  private function declarationOfDataLayer(array $lines): array
   {
     foreach ($lines as $index => $line)
     {
-      if (trim($line)==self::PUBLIC_STATIC_DL)
+      if (preg_match(self::PUBLIC_STATIC_DL2, $line)==1)
       {
-        return $index;
+        return ['2.x', $index];
+      }
+
+      if (trim($line)==self::PUBLIC_STATIC_DL1)
+      {
+        return ['1.x', $index];
       }
     }
 
@@ -120,16 +131,33 @@ class DataLayerTypeAnnotationCommand extends PlaisioCommand
   {
     $source = file_get_contents($nubPath);
     $lines  = explode(PHP_EOL, $source);
-    $index  = $this->declarationOfDataLayer($lines);
+    [$version, $index] = $this->declarationOfDataLayer($lines);
 
-    if ($index<=4 || substr(trim($lines[$index - 2]), 0, 6)!=='* @var')
+    switch ($version)
     {
-      throw new RuntimeException('Annotation of the DataLayer not found in %s', $nubPath);
-    }
+      case '1.x':
+        if ($index<=4 || substr(trim($lines[$index - 2]), 0, 6)!=='* @var')
+        {
+          throw new RuntimeException('Annotation of the DataLayer not found in %s', $nubPath);
+        }
 
-    $lines[$index - 2] = sprintf('%s@var %s',
-                                 strstr($lines[$index - 2], '@var', true),
-                                 '\\'.ltrim($wrapperClass, '\\'));
+        $lines[$index - 2] = sprintf('%s@var %s',
+                                     strstr($lines[$index - 2], '@var', true),
+                                     '\\'.ltrim($wrapperClass, '\\'));
+        break;
+
+      case '2.x':
+        preg_match(self::PUBLIC_STATIC_DL2, $lines[$index], $parts);
+        $lines[$index] = sprintf('%s %s %s %s',
+                                 $parts['property'],
+                                 '\\'.ltrim($wrapperClass, '\\'),
+                                 $parts['dl'],
+                                 trim($parts['comment']));
+        break;
+
+      default:
+        throw new FallenException('version', $version);
+    }
 
     return implode(PHP_EOL, $lines);
   }
