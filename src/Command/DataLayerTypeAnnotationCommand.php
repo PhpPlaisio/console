@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Plaisio\Console\Command;
 
-use Composer\Autoload\ClassLoader;
 use Noodlehaus\Config;
+use Plaisio\Console\Helper\ClassHelper;
 use Plaisio\Console\Helper\PlaisioXmlHelper;
 use Plaisio\Console\Helper\TwoPhaseWrite;
 use SetBased\Config\TypedConfig;
@@ -20,11 +20,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 class DataLayerTypeAnnotationCommand extends PlaisioCommand
 {
   //--------------------------------------------------------------------------------------------------------------------
-  /**
-   * Class name of the kernel.
-   */
-  const PLAISIO_KERNEL_NUB = '\\Plaisio\\Kernel\\Nub';
-
   /**
    * The declaration of the DataLayer, kernel 1.x.
    */
@@ -42,7 +37,7 @@ class DataLayerTypeAnnotationCommand extends PlaisioCommand
   protected function configure()
   {
     $this->setName('plaisio:data-layer-type-annotation')
-         ->setDescription(sprintf('Sets the type annotation of the DataLayer in %s', self::PLAISIO_KERNEL_NUB))
+         ->setDescription(sprintf('Sets the type annotation of the DataLayer in %s', ClassHelper::PLAISIO_KERNEL_NUB))
          ->addArgument('class', InputArgument::OPTIONAL, 'The class of the DataLayer');
   }
 
@@ -60,36 +55,13 @@ class DataLayerTypeAnnotationCommand extends PlaisioCommand
       $configFilename = $this->phpStratumConfigFilename();
       $wrapperClass   = $this->wrapperClass($configFilename);
     }
-    $nubPath = $this->classPath(self::PLAISIO_KERNEL_NUB);
+    $nubPath = ClassHelper::classPath(ClassHelper::PLAISIO_KERNEL_NUB);
     $source  = $this->fixAnnotation($nubPath, $wrapperClass);
 
     $helper = new TwoPhaseWrite($this->io);
     $helper->write($nubPath, $source);
 
     return 0;
-  }
-
-  //--------------------------------------------------------------------------------------------------------------------
-  /**
-   * Returns the path to the source file of a class.
-   *
-   * @param string $class The name of the class.
-   *
-   * @return string
-   */
-  private function classPath(string $class): string
-  {
-    /** @var ClassLoader $loader */
-    $loader = spl_autoload_functions()[0][0];
-
-    // Find the source file of the constant class.
-    $filename = $loader->findFile(ltrim($class, '\\'));
-    if ($filename===false)
-    {
-      throw new RuntimeException("ClassLoader can not find class '%s'", $class);
-    }
-
-    return realpath($filename);
   }
 
   //--------------------------------------------------------------------------------------------------------------------
