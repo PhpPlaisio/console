@@ -13,12 +13,6 @@ class ClassHelper
 {
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * Class name of the kernel.
-   */
-  const PLAISIO_KERNEL_NUB = '\\Plaisio\\Kernel\\Nub';
-
-  //--------------------------------------------------------------------------------------------------------------------
-  /**
    * Returns the first line of the class declaration in the source code of a class.
    *
    * @param string[] $lines The source code of the class.

@@ -29,14 +29,14 @@ class PlaisioXmlHelper
   /**
    * PlaisioXmlHelper constructor.
    *
-   * @param string|null $path Path to plaisio.xml. If null the plaisio.xml of the current project will be used.
+   * @param string $path Path to the PhpPlaisio configuration file.
    */
-  public function __construct(?string $path = null)
+  public function __construct(string $path)
   {
+    $this->path = $path;
+
     try
     {
-      $this->path = $path ?? PlaisioXmlUtility::plaisioXmlPath();
-
       $this->xml = new \DOMDocument();
       $this->xml->load($this->path, LIBXML_NOWARNING);
     }
@@ -59,6 +59,28 @@ class PlaisioXmlHelper
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
+   * Returns all kernel properties in this PhpPlaisio config file.
+   *
+   * @return array
+   */
+  public function queryKernelProperties(): array
+  {
+    $properties = [];
+
+    $xpath = new \DOMXpath($this->xml);
+    $list  = $xpath->query('/kernel/properties/property');
+    foreach ($list as $item)
+    {
+      $properties[] = ['type'        => $xpath->query('type', $item)[0]->nodeValue ?? null,
+                       'name'        => $xpath->query('name', $item)[0]->nodeValue ?? null,
+                       'description' => $xpath->query('description', $item)[0]->nodeValue ?? null];
+    }
+
+    return $properties;
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
    * Returns the path to the config file of PhpStratum.
    *
    * @return string
@@ -66,7 +88,7 @@ class PlaisioXmlHelper
   public function queryPhpStratumConfigFilename(): string
   {
     $xpath = new \DOMXpath($this->xml);
-    $node  = $xpath->query('/plaisio/stratum/config')->item(0);
+    $node  = $xpath->query('/stratum/config')->item(0);
 
     if ($node===null)
     {
@@ -87,7 +109,7 @@ class PlaisioXmlHelper
     $patterns = [];
 
     $xpath = new \DOMXpath($this->xml);
-    $list  = $xpath->query('/plaisio/stratum/includes/include');
+    $list  = $xpath->query('/stratum/includes/include');
     foreach ($list as $item)
     {
       $patterns[] = $item->nodeValue;
@@ -107,7 +129,7 @@ class PlaisioXmlHelper
     $commands = [];
 
     $xpath = new \DOMXpath($this->xml);
-    $list  = $xpath->query('/plaisio/commands/command');
+    $list  = $xpath->query('/commands/command');
     foreach ($list as $item)
     {
       /** @var \DOMElement $item */

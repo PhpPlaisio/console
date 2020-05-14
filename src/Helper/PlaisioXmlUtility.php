@@ -12,15 +12,17 @@ class PlaisioXmlUtility
 {
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * Returns a list of paths to plaisio.xml files of all installed packages and of the current project.
+   * Returns a list of paths to plaisio-*.xml files of all installed packages and of the current project.
+   *
+   * @param string $section The section of PhpPlaisio configuration.
    *
    * @return string[]
    */
-  public static function findPlaisioXmlAll(): array
+  public static function findPlaisioXmlAll(string $section): array
   {
-    $list = self::findPlaisioXmlPackages();
+    $list = self::findPlaisioXmlPackages($section);
 
-    $plaisioConfigPath = self::plaisioXmlPath();
+    $plaisioConfigPath = self::plaisioXmlPath($section);
     if (is_file($plaisioConfigPath))
     {
       $list[] = $plaisioConfigPath;
@@ -33,9 +35,11 @@ class PlaisioXmlUtility
   /**
    * Returns a list of paths to plaisio.xml files of all installed packages.
    *
+   * @param string $section The section of PhpPlaisio configuration.
+   *
    * @return string[]
    */
-  public static function findPlaisioXmlPackages(): array
+  public static function findPlaisioXmlPackages(string $section): array
   {
     $list = [];
 
@@ -49,7 +53,7 @@ class PlaisioXmlUtility
         {
           if ($item2->isDir() && !$item2->isDot())
           {
-            $path = $item2->getPathname().DIRECTORY_SEPARATOR.'plaisio.xml';
+            $path = sprintf('%s%splaisio-%s.xml', $item2->getPathname(), DIRECTORY_SEPARATOR, $section);
             if (is_file($path))
             {
               $list[] = self::relativePath($path);
@@ -68,15 +72,32 @@ class PlaisioXmlUtility
   /**
    * Returns the path to plaisio.xml of the current project.
    *
+   * @param string $section The section of PhpPlaisio configuration.
+   *
    * @return string
    */
-  public static function plaisioXmlPath(): string
+  public static function plaisioXmlPath(string $section): string
   {
-    $path = getenv('PLAISIO_CONFIG');
+    $dir = getenv('PLAISIO_CONFIG_DIR') ?? dirname(self::vendorDir());
 
-    if ($path===false)
+    return sprintf('%s%splaisio-%s.xml', $dir, DIRECTORY_SEPARATOR, $section);
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
+   * Returns the relative path of path if the path is below the cwd. Otherwise returns the path unmodified.
+   *
+   * @param string $path The path.
+   *
+   * @return string
+   */
+  public static function relativePath(string $path): string
+  {
+    $cwd = getcwd();
+
+    if (strncmp($path, $cwd, strlen($cwd))===0)
     {
-      $path = dirname(self::vendorDir()).'/plaisio.xml';
+      return ltrim(substr($path, strlen($cwd)), DIRECTORY_SEPARATOR);
     }
 
     return $path;
@@ -91,26 +112,6 @@ class PlaisioXmlUtility
   public static function vendorDir(): string
   {
     return self::relativePath(dirname(dirname(dirname(dirname(__DIR__)))));
-  }
-
-  //--------------------------------------------------------------------------------------------------------------------
-  /**
-   * Returns the relative path of path if the path is below the cwd. Otherwise returns the path unmodified.
-   *
-   * @param string $path The path.
-   *
-   * @return string
-   */
-  private static function relativePath(string $path): string
-  {
-    $cwd = getcwd();
-
-    if (strncmp($path, $cwd, strlen($cwd))===0)
-    {
-      return ltrim(substr($path, strlen($cwd)), DIRECTORY_SEPARATOR);
-    }
-
-    return $path;
   }
 
   //--------------------------------------------------------------------------------------------------------------------

@@ -10,6 +10,7 @@
     "php": ">=7.3",
     "ext-dom": "*",
     "ext-libxml": "*",
+    "plaisio/kernel": "^3.0",
     "setbased/error-handler": "^1.2",
     "setbased/exception": "^2.1",
     "setbased/typed-config": "^1.1",

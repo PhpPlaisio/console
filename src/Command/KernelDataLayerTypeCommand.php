@@ -6,29 +6,25 @@ namespace Plaisio\Console\Command;
 use Noodlehaus\Config;
 use Plaisio\Console\Helper\ClassHelper;
 use Plaisio\Console\Helper\PlaisioXmlHelper;
+use Plaisio\Console\Helper\PlaisioXmlUtility;
 use Plaisio\Console\Helper\TwoPhaseWrite;
+use Plaisio\PlaisioKernel;
 use SetBased\Config\TypedConfig;
-use SetBased\Exception\FallenException;
 use SetBased\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Command for collecting source patterns for finding stored routines provided by packages.
+ * Command for setting the type of the DataLayer in the kernel.
  */
-class DataLayerTypeAnnotationCommand extends PlaisioCommand
+class KernelDataLayerTypeCommand extends PlaisioCommand
 {
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * The declaration of the DataLayer, kernel 1.x.
+   * The declaration of the DataLayer.
    */
-  const PUBLIC_STATIC_DL1 = 'public static $DL;';
-
-  /**
-   * The declaration of the DataLayer, kernel 2.x.
-   */
-  const PUBLIC_STATIC_DL2 = '/(?P<property>.*@property-read) (?P<class>.+) (?P<dl>\$DL) (?P<comment>.*)$/';
+  const PUBLIC_STATIC_DL = '/(?P<property>.*@property-read) (?P<class>.+) (?P<dl>\$DL) (?P<comment>.*)$/';
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
@@ -36,8 +32,8 @@ class DataLayerTypeAnnotationCommand extends PlaisioCommand
    */
   protected function configure()
   {
-    $this->setName('plaisio:data-layer-type-annotation')
-         ->setDescription(sprintf('Sets the type annotation of the DataLayer in %s', ClassHelper::PLAISIO_KERNEL_NUB))
+    $this->setName('plaisio:kernel-data-layer-type')
+         ->setDescription(sprintf('Sets the type of the DataLayer in %s', PlaisioKernel::class))
          ->addArgument('class', InputArgument::OPTIONAL, 'The class of the DataLayer');
   }
 
@@ -55,7 +51,7 @@ class DataLayerTypeAnnotationCommand extends PlaisioCommand
       $configFilename = $this->phpStratumConfigFilename();
       $wrapperClass   = $this->wrapperClass($configFilename);
     }
-    $nubPath = ClassHelper::classPath(ClassHelper::PLAISIO_KERNEL_NUB);
+    $nubPath = ClassHelper::classPath(PlaisioKernel::class);
     $source  = $this->fixAnnotation($nubPath, $wrapperClass);
 
     $helper = new TwoPhaseWrite($this->io);
@@ -70,20 +66,15 @@ class DataLayerTypeAnnotationCommand extends PlaisioCommand
    *
    * @param string[] $lines The source of \Plaisio\Kernel\Nub as lines.
    *
-   * @return array
+   * @return int
    */
-  private function declarationOfDataLayer(array $lines): array
+  private function declarationOfDataLayer(array $lines): int
   {
     foreach ($lines as $index => $line)
     {
-      if (preg_match(self::PUBLIC_STATIC_DL2, $line)==1)
+      if (preg_match(self::PUBLIC_STATIC_DL, $line)==1)
       {
-        return ['2.x', $index];
-      }
-
-      if (trim($line)==self::PUBLIC_STATIC_DL1)
-      {
-        return ['1.x', $index];
+        return $index;
       }
     }
 
@@ -103,33 +94,14 @@ class DataLayerTypeAnnotationCommand extends PlaisioCommand
   {
     $source = file_get_contents($nubPath);
     $lines  = explode(PHP_EOL, $source);
-    [$version, $index] = $this->declarationOfDataLayer($lines);
+    $index  = $this->declarationOfDataLayer($lines);
 
-    switch ($version)
-    {
-      case '1.x':
-        if ($index<=4 || substr(trim($lines[$index - 2]), 0, 6)!=='* @var')
-        {
-          throw new RuntimeException('Annotation of the DataLayer not found in %s', $nubPath);
-        }
-
-        $lines[$index - 2] = sprintf('%s@var %s',
-                                     strstr($lines[$index - 2], '@var', true),
-                                     '\\'.ltrim($wrapperClass, '\\'));
-        break;
-
-      case '2.x':
-        preg_match(self::PUBLIC_STATIC_DL2, $lines[$index], $parts);
-        $lines[$index] = sprintf('%s %s %s %s',
-                                 $parts['property'],
-                                 '\\'.ltrim($wrapperClass, '\\'),
-                                 $parts['dl'],
-                                 trim($parts['comment']));
-        break;
-
-      default:
-        throw new FallenException('version', $version);
-    }
+    preg_match(self::PUBLIC_STATIC_DL, $lines[$index], $parts);
+    $lines[$index] = sprintf('%s %s %s %s',
+                             $parts['property'],
+                             '\\'.ltrim($wrapperClass, '\\'),
+                             $parts['dl'],
+                             trim($parts['comment']));
 
     return implode(PHP_EOL, $lines);
   }
@@ -142,9 +114,12 @@ class DataLayerTypeAnnotationCommand extends PlaisioCommand
    */
   private function phpStratumConfigFilename(): string
   {
-    $helper = new PlaisioXmlHelper();
+    $path1   = PlaisioXmlUtility::plaisioXmlPath('stratum');
+    $helper = new PlaisioXmlHelper($path1);
 
-    return $helper->queryPhpStratumConfigFilename();
+    $path2 = $helper->queryPhpStratumConfigFilename();
+
+    return PlaisioXmlUtility::relativePath(dirname($path1).DIRECTORY_SEPARATOR.$path2);
   }
 
   //--------------------------------------------------------------------------------------------------------------------

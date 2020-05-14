@@ -5,6 +5,7 @@ namespace Plaisio\Console\Command;
 
 use Plaisio\Console\Helper\ClassHelper;
 use Plaisio\Console\Helper\TwoPhaseWrite;
+use Plaisio\PlaisioKernel;
 use SetBased\Helper\Cast;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -36,7 +37,7 @@ class KernelPropertyReadWriteCommand extends PlaisioCommand
 
     $name = Cast::toManString($input->getArgument('name'));
 
-    $nubPath = ClassHelper::classPath(ClassHelper::PLAISIO_KERNEL_NUB);
+    $nubPath = ClassHelper::classPath(PlaisioKernel::class);
     $source  = $this->readWriteProperty($nubPath, $name);
 
     $helper = new TwoPhaseWrite($this->io);

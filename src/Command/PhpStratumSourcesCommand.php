@@ -66,7 +66,7 @@ class PhpStratumSourcesCommand extends PlaisioCommand
    */
   private function findPhpStratumSourcePatterns(): array
   {
-    $plaisioXmlList = PlaisioXmlUtility::findPlaisioXmlAll();
+    $plaisioXmlList = PlaisioXmlUtility::findPlaisioXmlAll('stratum');
 
     $patterns = [];
     foreach ($plaisioXmlList as $plaisioConfigPath)
@@ -93,7 +93,8 @@ class PhpStratumSourcesCommand extends PlaisioCommand
    */
   private function phpStratumConfigFilename(): string
   {
-    $helper = new PlaisioXmlHelper();
+    $path   = PlaisioXmlUtility::plaisioXmlPath('database');
+    $helper = new PlaisioXmlHelper($path);
 
     return $helper->queryPhpStratumConfigFilename();
   }
