@@ -11,6 +11,7 @@ use Plaisio\Console\Helper\TwoPhaseWrite;
 use Plaisio\PlaisioKernel;
 use SetBased\Config\TypedConfig;
 use SetBased\Exception\RuntimeException;
+use SetBased\Helper\Cast;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -45,7 +46,7 @@ class KernelDataLayerTypeCommand extends PlaisioCommand
   {
     $this->io->title('Plaisio: DataLayer Type Annotation');
 
-    $wrapperClass = $input->getArgument('class');
+    $wrapperClass = Cast::toManString($input->getArgument('class'));
     if ($wrapperClass===null)
     {
       $configFilename = $this->phpStratumConfigFilename();
