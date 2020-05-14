@@ -46,7 +46,7 @@ class KernelDataLayerTypeCommand extends PlaisioCommand
   {
     $this->io->title('Plaisio: DataLayer Type Annotation');
 
-    $wrapperClass = Cast::toManString($input->getArgument('class'));
+    $wrapperClass = Cast::toOptString($input->getArgument('class'));
     if ($wrapperClass===null)
     {
       $configFilename = $this->phpStratumConfigFilename();
