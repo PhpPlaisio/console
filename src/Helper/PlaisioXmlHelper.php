@@ -26,6 +26,7 @@ class PlaisioXmlHelper
   protected $xml;
 
   //--------------------------------------------------------------------------------------------------------------------
+
   /**
    * PlaisioXmlHelper constructor.
    *
@@ -141,6 +142,17 @@ class PlaisioXmlHelper
     }
 
     return $commands;
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
+   * Returns the content of the configuration file as a DOMDocument.
+   *
+   * @return \DOMDocument
+   */
+  public function xml(): \DOMDocument
+  {
+    return $this->xml;
   }
 
   //--------------------------------------------------------------------------------------------------------------------

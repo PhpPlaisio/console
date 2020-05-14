@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Plaisio\Console\Command;
 
 use Noodlehaus\Config;
-use Plaisio\Console\Helper\ClassHelper;
 use Plaisio\Console\Helper\PlaisioXmlHelper;
 use Plaisio\Console\Helper\PlaisioXmlUtility;
 use Plaisio\Console\Helper\TwoPhaseWrite;
@@ -52,59 +51,14 @@ class KernelDataLayerTypeCommand extends PlaisioCommand
       $configFilename = $this->phpStratumConfigFilename();
       $wrapperClass   = $this->wrapperClass($configFilename);
     }
-    $nubPath = ClassHelper::classPath(PlaisioKernel::class);
-    $source  = $this->fixAnnotation($nubPath, $wrapperClass);
+
+    $configPath = PlaisioXmlUtility::vendorDir().DIRECTORY_SEPARATOR.'plaisio/kernel/plaisio-kernel.xml';
+    $config     = $this->updateDataLayerType($configPath, $wrapperClass);
 
     $helper = new TwoPhaseWrite($this->io);
-    $helper->write($nubPath, $source);
+    $helper->write($configPath, $config);
 
     return 0;
-  }
-
-  //--------------------------------------------------------------------------------------------------------------------
-  /**
-   * Returns the index of the line with de declaration of the DataLayer.
-   *
-   * @param string[] $lines The source of \Plaisio\Kernel\Nub as lines.
-   *
-   * @return int
-   */
-  private function declarationOfDataLayer(array $lines): int
-  {
-    foreach ($lines as $index => $line)
-    {
-      if (preg_match(self::PUBLIC_STATIC_DL, $line)==1)
-      {
-        return $index;
-      }
-    }
-
-    throw new RuntimeException('Declaration of the DataLayer not found');
-  }
-
-  //--------------------------------------------------------------------------------------------------------------------
-  /**
-   * Replaces the type annotation of the DataLayer with the actual wrapper class.
-   *
-   * @param string $nubPath      The path to the source of \Plaisio\Kernel\Nub.
-   * @param string $wrapperClass The name of the class of the DataLayer.
-   *
-   * @return string
-   */
-  private function fixAnnotation(string $nubPath, string $wrapperClass): string
-  {
-    $source = file_get_contents($nubPath);
-    $lines  = explode(PHP_EOL, $source);
-    $index  = $this->declarationOfDataLayer($lines);
-
-    preg_match(self::PUBLIC_STATIC_DL, $lines[$index], $parts);
-    $lines[$index] = sprintf('%s %s %s %s',
-                             $parts['property'],
-                             '\\'.ltrim($wrapperClass, '\\'),
-                             $parts['dl'],
-                             trim($parts['comment']));
-
-    return implode(PHP_EOL, $lines);
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -115,12 +69,47 @@ class KernelDataLayerTypeCommand extends PlaisioCommand
    */
   private function phpStratumConfigFilename(): string
   {
-    $path1   = PlaisioXmlUtility::plaisioXmlPath('stratum');
+    $path1  = PlaisioXmlUtility::plaisioXmlPath('stratum');
     $helper = new PlaisioXmlHelper($path1);
 
     $path2 = $helper->queryPhpStratumConfigFilename();
 
     return PlaisioXmlUtility::relativePath(dirname($path1).DIRECTORY_SEPARATOR.$path2);
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
+   * Replaces the type annotation of the DataLayer with the actual wrapper class.
+   *
+   * @param string $path         The path to the config file plaisio-kernel.xml of package plaisio/kernel.
+   * @param string $wrapperClass The name of the class of the DataLayer.
+   *
+   * @return string
+   */
+  private function updateDataLayerType(string $path, string $wrapperClass): string
+  {
+    $config = new PlaisioXmlHelper($path);
+    $xml    = $config->xml();
+
+    $xpath = new \DOMXpath($xml);
+    $query = "/kernel/properties/property/name[text()='DL']";
+    $list  = $xpath->query($query);
+    if ($list->length!==1)
+    {
+      throw new RuntimeException('Unable to find the DataLayer in %s', $path);
+    }
+
+    $parent = $list->item(0)->parentNode;
+    $query  = 'type';
+    $list   = $xpath->query($query, $parent);
+    if ($list->length!==1)
+    {
+      throw new RuntimeException('Unable to find the type of the DataLayer in %s', $path);
+    }
+
+    $list->item(0)->nodeValue = '\\'.ltrim($wrapperClass, '\\');
+
+    return $xml->saveXML($xml);
   }
 
   //--------------------------------------------------------------------------------------------------------------------
