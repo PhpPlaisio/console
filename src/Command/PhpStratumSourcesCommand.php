@@ -93,7 +93,7 @@ class PhpStratumSourcesCommand extends PlaisioCommand
    */
   private function phpStratumConfigFilename(): string
   {
-    $path   = PlaisioXmlUtility::plaisioXmlPath('database');
+    $path   = PlaisioXmlUtility::plaisioXmlPath('stratum');
     $helper = new PlaisioXmlHelper($path);
 
     return $helper->queryPhpStratumConfigFilename();
