@@ -78,7 +78,11 @@ class PlaisioXmlUtility
    */
   public static function plaisioXmlPath(string $section): string
   {
-    $dir = getenv('PLAISIO_CONFIG_DIR') ?? dirname(self::vendorDir());
+    $dir = getenv('PLAISIO_CONFIG_DIR');
+    if ($dir===false || $dir==='')
+    {
+      $dir = dirname(self::vendorDir());
+    }
 
     return sprintf('%s%splaisio-%s.xml', $dir, DIRECTORY_SEPARATOR, $section);
   }
