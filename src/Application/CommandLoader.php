@@ -5,7 +5,6 @@ namespace Plaisio\Console\Application;
 
 use Plaisio\Console\Helper\PlaisioXmlHelper;
 use Plaisio\Console\Helper\PlaisioXmlUtility;
-use Plaisio\PlaisioKernel;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\CommandLoader\FactoryCommandLoader;
 
@@ -14,14 +13,6 @@ use Symfony\Component\Console\CommandLoader\FactoryCommandLoader;
  */
 class CommandLoader extends FactoryCommandLoader
 {
-  //--------------------------------------------------------------------------------------------------------------------
-  /**
-   * The kernel of PhpPlaisio.
-   *
-   * @var PlaisioKernel|null;
-   */
-  private $kernel;
-
   //--------------------------------------------------------------------------------------------------------------------
   /**
    * Object constructor.
@@ -41,19 +32,31 @@ class CommandLoader extends FactoryCommandLoader
    */
   public function get(string $name)
   {
-    $path = PlaisioXmlUtility::plaisioXmlPath('console');
-    if (file_exists($path))
-    {
-      $helper  = new PlaisioXmlHelper($path);
-      $factory = $helper->queryConsoleKernelFactory();
+    $command = parent::get($name);
 
-      if ($factory!==null)
+    if (method_exists($command, 'setPlaisioKernel'))
+    {
+      $path   = PlaisioXmlUtility::plaisioXmlPath('console');
+      $kernel = null;
+      if (file_exists($path))
       {
-        $this->kernel = $factory($name);
+        $helper  = new PlaisioXmlHelper($path);
+        $factory = $helper->queryConsoleKernelFactory();
+
+        if ($factory!==null)
+        {
+          $kernel = $factory($name);
+          $command->setPlaisioKernel($kernel);
+        }
+      }
+
+      if ($kernel===null)
+      {
+        throw new \InvalidArgumentException(sprintf('Kernel factory not found in %s.', $path));
       }
     }
 
-    return parent::get($name);
+    return $command;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
