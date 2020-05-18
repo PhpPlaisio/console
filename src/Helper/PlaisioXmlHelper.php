@@ -135,7 +135,7 @@ class PlaisioXmlHelper
     {
       /** @var \DOMElement $item */
       $name            = $item->getAttribute('name');
-      $class           = $item->nodeValue;
+      $class           = trim($item->nodeValue);
       $commands[$name] = function () use ($class) {
         return new $class;
       };
