@@ -60,6 +60,26 @@ class PlaisioXmlHelper
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
+   * Returns the factory for creating an instance of PlaisioKernel.
+   *
+   * @return string[]
+   */
+  public function queryConsoleKernelFactory(): ?string
+  {
+    $xpath = new \DOMXpath($this->xml);
+    $list  = $xpath->query('/console/kernel/factory');
+    if ($list->length==1)
+    {
+      $factory = trim($list->item(0)->nodeValue);
+
+      return ($factory==='') ? null : $factory;
+    }
+
+    return null;
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
    * Returns all kernel properties in this PhpPlaisio config file.
    *
    * @return array
