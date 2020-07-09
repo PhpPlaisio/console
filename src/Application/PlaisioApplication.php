@@ -16,7 +16,7 @@ class PlaisioApplication extends Application
    */
   public function __construct()
   {
-    parent::__construct('Plaisio', '2.3.0');
+    parent::__construct('Plaisio', '2.3.1');
 
     $this->setCommandLoader(new CommandLoader());
   }
