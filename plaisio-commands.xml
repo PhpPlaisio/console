@@ -1,4 +1,5 @@
 <commands>
+    <command name="plaisio:assets">\Plaisio\Console\Command\AssetsCommand</command>
     <command name="plaisio:kernel-data-layer-type">\Plaisio\Console\Command\KernelDataLayerTypeCommand</command>
     <command name="plaisio:kernel-properties">\Plaisio\Console\Command\KernelPropertiesCommand</command>
     <command name="plaisio:kernel-property-read-write">\Plaisio\Console\Command\KernelPropertyReadWriteCommand</command>
