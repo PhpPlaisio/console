@@ -26,7 +26,6 @@ class PlaisioXmlHelper
   protected $xml;
 
   //--------------------------------------------------------------------------------------------------------------------
-
   /**
    * PlaisioXmlHelper constructor.
    *
@@ -62,7 +61,7 @@ class PlaisioXmlHelper
   /**
    * Returns the factory for creating an instance of PlaisioKernel.
    *
-   * @return string[]
+   * @return string|null
    */
   public function queryConsoleKernelFactory(): ?string
   {

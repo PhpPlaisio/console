@@ -42,6 +42,100 @@ class PlaisioStyle extends SymfonyStyle
   }
 
   //--------------------------------------------------------------------------------------------------------------------
+  /**
+   * Writes a debug message.
+   */
+  public function logDebug()
+  {
+    if ($this->getVerbosity()>=OutputInterface::VERBOSITY_DEBUG)
+    {
+      $message = $this->composeMessage(func_get_args());
+      $this->writeln('<info>'.$message.'</info>');
+    }
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
+   * Writes an infomation message.
+   */
+  public function logInfo()
+  {
+    if ($this->getVerbosity()>=OutputInterface::VERBOSITY_NORMAL)
+    {
+      $message = $this->composeMessage(func_get_args());
+      $this->writeln('<info>'.$message.'</info>');
+    }
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
+   * Writes a notification message.
+   */
+  public function logNote()
+  {
+    if ($this->getVerbosity()>=OutputInterface::VERBOSITY_NORMAL)
+    {
+      $message = $this->composeMessage(func_get_args());
+      $this->writeln('<note> ! [NOTE] '.$message.'</note>');
+    }
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
+   * Writes a verbose message.
+   */
+  public function logVerbose()
+  {
+    if ($this->getVerbosity()>=OutputInterface::VERBOSITY_VERBOSE)
+    {
+      $message = $this->composeMessage(func_get_args());
+      $this->writeln('<info>'.$message.'</info>');
+    }
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
+   * Writes a very verbose message.
+   */
+  public function logVeryVerbose()
+  {
+    if ($this->getVerbosity()>=OutputInterface::VERBOSITY_VERY_VERBOSE)
+    {
+      $message = $this->composeMessage(func_get_args());
+      $this->writeln('<info>'.$message.'</info>');
+    }
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
+   * Composes the message based on the arguments.
+   *
+   * @param array $args The arguments.
+   *
+   * @return string
+   */
+  private function composeMessage(array $args): string
+  {
+    $args   = func_get_args();
+    $format = array_shift($args);
+
+    if ($format===null)
+    {
+      $message = '';
+    }
+    elseif (empty($args))
+    {
+      $message = $format;
+    }
+    else
+    {
+      $message = vsprintf($format, $args);
+    }
+
+    return $message;
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
 }
 
 //----------------------------------------------------------------------------------------------------------------------

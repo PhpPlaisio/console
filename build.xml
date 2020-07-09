@@ -5,6 +5,15 @@
     <!-- Run composer update and executes various other updates -->
     <target name="update">
         <exec command="composer update" checkreturn="true" passthru="true"/>
+        <phing phingfile="build.xml" target="code-generation" haltonfailure="true"/>
+    </target>
+
+    <target name="code-generation">
+        <exec executable="bin/stratum" checkreturn="true" passthru="true">
+            <arg value="--ansi"/>
+            <arg value="stratum"/>
+            <arg value="etc/stratum-assets.ini"/>
+        </exec>
     </target>
 
     <!-- Creates a new version/release. -->
