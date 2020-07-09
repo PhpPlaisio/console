@@ -94,12 +94,7 @@ class AssetsCommand extends PlaisioCommand
 
       $this->io->logVerbose('Adding asset <fso>%s</fso>', $pathDest);
 
-      $dir = Path::getDirectory($pathDest);
-      if (!file_exists($dir))
-      {
-        mkdir($dir, 0777, true);
-      }
-      copy($pathSource, $pathDest);
+      $this->copyFile($pathSource, $pathDest);
 
       $this->store->insertRow('PLS_CURRENT', ['cur_id'       => null,
                                               'cur_type'     => $asset['ass_type'],
@@ -128,7 +123,7 @@ class AssetsCommand extends PlaisioCommand
         $this->count['old']++;
       }
 
-      $this->store->plsCurrentAssetsDeleteAsset($asset['ass_type'], $asset['ass_path'], $asset['ass_path']);
+      $this->store->plsCurrentAssetsDeleteAsset($asset['ass_type'], $asset['ass_base_dir'], $asset['ass_path']);
     }
   }
 
@@ -158,11 +153,29 @@ class AssetsCommand extends PlaisioCommand
       {
         $this->io->logVerbose('Updating asset <fso>%s</fso>', $pathDest);
 
-        copy($pathSource, $pathDest);
+        $this->copyFile($pathSource, $pathDest);
 
         $this->count['current']++;
       }
     }
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
+   * Copies a file.
+   *
+   * @param string $pathSource The path the the source file.
+   * @param string $pathDest   The path to the destination file.
+   */
+  private function copyFile(string $pathSource, string $pathDest): void
+  {
+    $dir = Path::getDirectory($pathDest);
+    if (!file_exists($dir))
+    {
+      mkdir($dir, 0777, true);
+    }
+
+    copy($pathSource, $pathDest);
   }
 
   //--------------------------------------------------------------------------------------------------------------------
