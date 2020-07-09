@@ -4,4 +4,6 @@
     <command name="plaisio:kernel-properties">\Plaisio\Console\Command\KernelPropertiesCommand</command>
     <command name="plaisio:kernel-property-read-write">\Plaisio\Console\Command\KernelPropertyReadWriteCommand</command>
     <command name="plaisio:php-stratum-sources">\Plaisio\Console\Command\PhpStratumSourcesCommand</command>
+    <command name="plaisio:type-script-automator">\Plaisio\Console\Command\TypeScriptAutomatorCommand</command>
+    <command name="plaisio:type-script-fixer">\Plaisio\Console\Command\TypeScriptFixerCommand</command>
 </commands>

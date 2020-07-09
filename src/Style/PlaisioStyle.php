@@ -116,7 +116,6 @@ class PlaisioStyle extends SymfonyStyle
    */
   private function composeMessage(array $args): string
   {
-    $args   = func_get_args();
     $format = array_shift($args);
 
     if ($format===null)

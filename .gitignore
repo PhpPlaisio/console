@@ -2,7 +2,7 @@
 /bin/composer
 /bin/jsonlint
 /bin/phing
-/bin/validate-json
+/bin/stratum
 /composer.lock
 /doc/
 /vendor/
