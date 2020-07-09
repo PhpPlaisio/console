@@ -194,7 +194,9 @@ class TypeScriptAutomatorHelper
       $this->runTypeScriptCompiler($path);
     }
 
-    if (Path::hasExtension($path, $this->jsExtension) && is_file(Path::changeExtension($path, $this->tsExtension)))
+    if (Path::hasExtension($path, $this->jsExtension) &&
+      is_file($path) &&
+      is_file(Path::changeExtension($path, $this->tsExtension)))
     {
       $this->runTypeScriptFixer($path);
     }
