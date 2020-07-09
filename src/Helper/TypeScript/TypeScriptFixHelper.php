@@ -57,7 +57,7 @@ class TypeScriptFixHelper
   public function __construct(PlaisioStyle $io, string $jsPath)
   {
     $this->io     = $io;
-    $this->jsPath = realpath($jsPath);
+    $this->jsPath = $jsPath;
     $this->marker = sprintf('// Modified by %s ', self::class);
   }
 

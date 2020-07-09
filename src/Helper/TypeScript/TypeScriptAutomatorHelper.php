@@ -290,7 +290,7 @@ class TypeScriptAutomatorHelper
       catch (\Throwable $exception)
       {
         $this->io->error($exception->getMessage());
-        $this->io->error($exception->getTrace());
+        $this->io->error($exception->getTraceAsString());
       }
     }
   }
@@ -424,7 +424,7 @@ class TypeScriptAutomatorHelper
 
     $this->io->logInfo('Running: %s', implode(' ', $command));
 
-    [$lines, $status] = ProgramExecution::exec1($command);
+    [$lines, $status] = ProgramExecution::exec1($command, null);
     if ($status!==0)
     {
       echo implode(PHP_EOL, $lines);
