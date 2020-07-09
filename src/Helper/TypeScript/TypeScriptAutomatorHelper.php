@@ -258,28 +258,28 @@ class TypeScriptAutomatorHelper
         $this->logEvent($event['mask'], $path);
         switch (true)
         {
-          case $event['mask'] & IN_CLOSE_WRITE:
+          case ($event['mask'] & IN_CLOSE_WRITE)!==0:
             $this->handleCloseWrite($path);
             break;
 
-          case $event['mask'] & IN_MOVED_TO:
+          case ($event['mask'] & IN_MOVED_TO)!==0:
             $this->handleMoveTo($path);
             break;
 
-          case $event['mask'] & IN_CREATE:
+          case ($event['mask'] & IN_CREATE)!==0:
             $this->handleCreate($path);
             break;
 
-          case $event['mask'] & IN_MOVED_FROM:
-          case $event['mask'] & IN_DELETE:
+          case ($event['mask'] & IN_MOVED_FROM)!==0:
+          case ($event['mask'] & IN_DELETE)!==0:
             $this->handleDelete($path);
             break;
 
-          case $event['mask'] & IN_DELETE_SELF:
+          case ($event['mask'] & IN_DELETE_SELF)!==0:
             $this->handleDeleteSelf($path, $event['wd']);
             break;
 
-          case $event['mask'] & IN_IGNORED:
+          case ($event['mask'] & IN_IGNORED)!==0:
             // nothing to do.
             break;
 
