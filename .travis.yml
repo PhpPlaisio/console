@@ -4,6 +4,7 @@ php:
   - '7.4'
 
 install:
+  - pecl install inotify
   - composer self-update
   - composer update
 
