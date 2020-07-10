@@ -250,10 +250,9 @@ class TypeScriptFixHelper
       $args = explode(',', $matches['args']);
 
       $replace = [];
-      foreach ($deps as $key => $dep)
+      foreach ($args as $key => $arg)
       {
-        $dep = trim($dep, '"');
-        $arg = $args[$key];
+        $dep = trim($deps[$key], '"');
 
         if (!in_array($dep, ['require', 'exports']))
         {
