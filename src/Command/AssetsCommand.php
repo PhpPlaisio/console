@@ -193,7 +193,7 @@ class AssetsCommand extends PlaisioCommand
    */
   private function findAssets(): void
   {
-    $plaisioXmlList = PlaisioXmlUtility::findPlaisioXmlAll('assets');
+    $plaisioXmlList = PlaisioXmlUtility::findPlaisioXmlPackages('assets');
     foreach ($plaisioXmlList as $plaisioConfigPath)
     {
       $helper = new AssetsPlaisioXmlHelper($plaisioConfigPath);
