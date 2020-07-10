@@ -159,7 +159,7 @@ class TypeScriptFixHelper
     {
       $dep = trim($dep, '"');
 
-      if (!in_array($dep, ['require', 'exports']))
+      if (substr($dep, 0, 1)==='.')
       {
         $depPath = Path::join(Path::getDirectory($this->namespace), $dep);
 
