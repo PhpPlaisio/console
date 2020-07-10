@@ -58,7 +58,7 @@ class TypeScriptFixHelper
   {
     $this->io     = $io;
     $this->jsPath = $jsPath;
-    $this->marker = sprintf('// Modified by %s ', self::class);
+    $this->marker = sprintf('// Modified by %s', self::class);
   }
 
   //--------------------------------------------------------------------------------------------------------------------
