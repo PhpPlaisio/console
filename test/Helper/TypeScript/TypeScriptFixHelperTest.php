@@ -21,8 +21,8 @@ class TypeScriptFixHelperTest extends TestCase
   {
     putenv(sprintf('PLAISIO_CONFIG_DIR=%s', Path::join(__DIR__, __FUNCTION__)));
 
-    $jsPath = Path::makeRelative(Path::join(__DIR__, __FUNCTION__, 'js', 'Test', 'Foo.js'), getcwd());
-    $orgPath = Path::changeExtension($jsPath, 'org.js');
+    $jsPath       = Path::makeRelative(Path::join(__DIR__, __FUNCTION__, 'js', 'Test', 'Foo.js'), getcwd());
+    $orgPath      = Path::changeExtension($jsPath, 'org.js');
     $expectedPath = Path::changeExtension($jsPath, 'expected.js');
     copy($orgPath, $jsPath);
 
@@ -35,8 +35,6 @@ class TypeScriptFixHelperTest extends TestCase
 
     self::assertSame(0, $tester->getStatusCode());
     self::assertFileEquals($expectedPath, $jsPath);
-
-    echo $tester->getDisplay();
 
     unlink($jsPath);
   }
