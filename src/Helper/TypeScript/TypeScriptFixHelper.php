@@ -74,13 +74,21 @@ class TypeScriptFixHelper
 
     if (!$this->hasBeenProcessed())
     {
-      $this->io->logInfo('TypeScript fixing: <fso>%s</fso>', $path);
+      if ($this->requiresFixing($path))
+      {
+        $this->io->logInfo('TypeScript fixing: <fso>%s</fso>', $path);
 
-      $this->fixDefine();
-      $this->fixExports1('Object.defineProperty(exports, "__esModule", { value: true });');
-      $this->fixExports1(sprintf('exports.%1$s = %1$s;', Path::getFilename($this->namespace)));
-      $this->fixExports2();
-      $this->fixReferences();
+        $this->fixDefine();
+        $this->fixExports1('Object.defineProperty(exports, "__esModule", { value: true });');
+        $this->fixExports1(sprintf('exports.%1$s = %1$s;', Path::getFilename($this->namespace)));
+        $this->fixExports2();
+        $this->fixReferences();
+      }
+      else
+      {
+        $this->io->logVeryVerbose("Main file doesn't require fixing: <fso>%s</fso>", $path);
+      }
+
       $this->writeJsSource($path);
     }
     else
@@ -288,6 +296,19 @@ class TypeScriptFixHelper
     {
       array_pop($this->lines);
     }
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
+   * Returns true if and only if the JS source requires fixing
+   *
+   * @param string $path The path to JS file.
+   *
+   * @return bool
+   */
+  private function requiresFixing($path): bool
+  {
+    return (!str_ends_with($path, '.main.js'));
   }
 
   //--------------------------------------------------------------------------------------------------------------------
