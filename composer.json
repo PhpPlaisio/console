@@ -23,11 +23,17 @@
   },
   "require-dev": {
     "phing/phing": "^2.0",
-    "setbased/phing-extensions": "^2.1"
+    "setbased/phing-extensions": "^2.1",
+    "phpunit/phpunit": "^9.0"
   },
   "autoload": {
     "psr-4": {
       "Plaisio\\Console\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Plaisio\\Console\\Test\\": "test/"
     }
   },
   "bin": [

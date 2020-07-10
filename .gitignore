@@ -2,7 +2,10 @@
 /bin/composer
 /bin/jsonlint
 /bin/phing
+/bin/phpunit
 /bin/stratum
 /composer.lock
 /doc/
+/test/coverage.xml
+/test/report/
 /vendor/
