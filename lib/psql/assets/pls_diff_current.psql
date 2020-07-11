@@ -5,6 +5,7 @@
  */
 select ass_type
 ,      ass_base_dir
+,      ass_to_dir
 ,      ass_path
 ,      sum(case src when 1 then 1 else 0 end) cnt1
 ,      sum(case src when 2 then 1 else 0 end) cnt2
@@ -12,6 +13,7 @@ from
 (
   select ass_type
   ,      ass_base_dir
+  ,      ass_to_dir
   ,      ass_path
   ,      1               src
   from   PLS_ASSET
@@ -20,15 +22,18 @@ from
 
   select cur_type
   ,      cur_base_dir
+  ,      cur_to_dir
   ,      cur_path
   ,      2               src
   from   PLS_CURRENT
 ) t
 group by ass_type
 ,        ass_base_dir
+,        ass_to_dir
 ,        ass_path
 having cnt1 = 1
 and    cnt2 = 1
 order by ass_type
 ,        ass_base_dir
+,        ass_to_dir
 ,        ass_path

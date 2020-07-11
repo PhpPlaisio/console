@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<assets>
+    <asset type="js" todir="">
+        <fileset dir="www/js">
+            <include name="**/*.ts"/>
+        </fileset>
+    </asset>
+    <asset type="css">
+        <fileset dir="www/css">
+            <include name="**/*"/>
+        </fileset>
+    </asset>
+</assets>

@@ -5,8 +5,8 @@ namespace Plaisio\Console\Command;
 
 use Plaisio\Console\Helper\Assets\AssetsPlaisioXmlHelper;
 use Plaisio\Console\Helper\Assets\AssetsStore;
+use Plaisio\Console\Helper\ConfigException;
 use Plaisio\Console\Helper\PlaisioXmlUtility;
-use SetBased\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Webmozart\PathUtil\Path;
@@ -17,13 +17,6 @@ use Webmozart\PathUtil\Path;
 class AssetsCommand extends PlaisioCommand
 {
   //--------------------------------------------------------------------------------------------------------------------
-  /**
-   * All possible assets types.
-   *
-   * @var string[]
-   */
-  private $assetTypes = ['css', 'images', 'js'];
-
   /**
    * File count.
    *
@@ -63,19 +56,29 @@ class AssetsCommand extends PlaisioCommand
   {
     $this->io->title('Plaisio: Assets');
 
-    $this->readResourceDir();
-    $this->createStore();
-    $this->findAssets();
-    $this->readCurrentAssets();
-    $this->assetsRemoveObsolete();
-    $this->assetsUpdateCurrent();
-    $this->assetsAddNew();
-    $this->writeCurrentAssets();
+    try
+    {
+      $this->readResourceDir();
+      $this->createStore();
+      $this->findAssets();
+      $this->readCurrentAssets();
+      $this->assetsRemoveObsolete();
+      $this->assetsUpdateCurrent();
+      $this->assetsAddNew();
+      $this->writeCurrentAssets();
 
-    $this->io->text(sprintf('Removed %d, updated %d, and added %d assets',
-                            $this->count['old'],
-                            $this->count['current'],
-                            $this->count['new']));
+      $this->io->text(sprintf('Removed %d, updated %d, and added %d assets',
+                              $this->count['old'],
+                              $this->count['current'],
+                              $this->count['new']));
+    }
+    catch (ConfigException $exception)
+    {
+      $this->io->error($exception->getMessage());
+      $this->io->logVerbose($exception->getTraceAsString());
+
+      return -1;
+    }
 
     return 0;
   }
@@ -89,8 +92,8 @@ class AssetsCommand extends PlaisioCommand
     $assets = $this->store->plsDiffNew();
     foreach ($assets as $asset)
     {
-      $pathSource = Path::join($asset['ass_base_dir'], $asset['ass_path']);
-      $pathDest   = Path::join($this->rootAssetDir, $asset['ass_type'], $asset['ass_path']);
+      $pathSource = $this->composeSourcePath($asset);
+      $pathDest   = $this->composeDestPath($asset);
 
       $this->io->logVerbose('Adding asset <fso>%s</fso>', $pathDest);
 
@@ -99,6 +102,7 @@ class AssetsCommand extends PlaisioCommand
       $this->store->insertRow('PLS_CURRENT', ['cur_id'       => null,
                                               'cur_type'     => $asset['ass_type'],
                                               'cur_base_dir' => $asset['ass_base_dir'],
+                                              'cur_to_dir'   => $asset['ass_to_dir'],
                                               'cur_path'     => $asset['ass_path']]);
       $this->count['new']++;
     }
@@ -113,7 +117,7 @@ class AssetsCommand extends PlaisioCommand
     $assets = $this->store->plsDiffObsolete();
     foreach ($assets as $asset)
     {
-      $path = Path::join($this->rootAssetDir, $asset['ass_type'], $asset['ass_path']);
+      $path = $this->composeDestPath($asset);
       if (file_exists($path))
       {
         $this->io->logVerbose('Removing obsolete asset <fso>%s</fso>', $path);
@@ -123,7 +127,10 @@ class AssetsCommand extends PlaisioCommand
         $this->count['old']++;
       }
 
-      $this->store->plsCurrentAssetsDeleteAsset($asset['ass_type'], $asset['ass_base_dir'], $asset['ass_path']);
+      $this->store->plsCurrentAssetsDeleteAsset($asset['ass_type'],
+                                                $asset['ass_base_dir'],
+                                                $asset['ass_to_dir'],
+                                                $asset['ass_path']);
     }
   }
 
@@ -136,8 +143,8 @@ class AssetsCommand extends PlaisioCommand
     $assets = $this->store->plsDiffCurrent();
     foreach ($assets as $asset)
     {
-      $pathSource = Path::join($asset['ass_base_dir'], $asset['ass_path']);
-      $pathDest   = Path::join($this->rootAssetDir, $asset['ass_type'], $asset['ass_path']);
+      $pathSource = $this->composeSourcePath($asset);
+      $pathDest   = $this->composeDestPath($asset);
 
       $source = file_get_contents($pathSource);
       if (file_exists($pathDest))
@@ -158,6 +165,32 @@ class AssetsCommand extends PlaisioCommand
         $this->count['current']++;
       }
     }
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
+   * Composes the destination path of an asset.
+   *
+   * @param array $asset The details of the asset.
+   *
+   * @return string
+   */
+  private function composeDestPath(array $asset): string
+  {
+    return Path::join($this->rootAssetDir, $asset['ass_type'], $asset['ass_to_dir'] ?? '', $asset['ass_path']);
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
+   * Composes the source path of an asset.
+   *
+   * @param array $asset The details of the asset.
+   *
+   * @return string
+   */
+  private function composeSourcePath(array $asset): string
+  {
+    return Path::join($asset['ass_base_dir'], $asset['ass_path']);
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -190,27 +223,50 @@ class AssetsCommand extends PlaisioCommand
   //--------------------------------------------------------------------------------------------------------------------
   /**
    * Finds all assets all packages (using plaisio-assets.xml files).
+   *
+   * @throws ConfigException
    */
   private function findAssets(): void
   {
     $plaisioXmlList = PlaisioXmlUtility::findPlaisioXmlPackages('assets');
     foreach ($plaisioXmlList as $plaisioConfigPath)
     {
-      $helper = new AssetsPlaisioXmlHelper($plaisioConfigPath);
-      foreach ($this->assetTypes as $assetType)
+      $helper      = new AssetsPlaisioXmlHelper($plaisioConfigPath);
+      $collections = $helper->queryAssetFileList();
+      if (!empty($collections))
       {
-        $files = $helper->queryFileList($assetType);
-        if (!empty($files))
+        foreach ($collections as $collection)
         {
-          foreach ($files['files'] as $file)
+          foreach ($collection['files'] as $file)
           {
-            $this->io->logVerbose('Found asset <fso>%s</fso>', Path::join($files['base-dir'], $file));
+            $this->io->logVerbose('Found asset <fso>%s</fso>', Path::join($collection['base-dir'], $file));
 
             $this->store->insertRow('PLS_ASSET', ['ass_id'       => null,
-                                                  'ass_type'     => $files['type'],
-                                                  'ass_base_dir' => $files['base-dir'],
+                                                  'ass_type'     => $collection['type'],
+                                                  'ass_base_dir' => $collection['base-dir'],
+                                                  'ass_to_dir'   => $collection['to-dir'],
                                                   'ass_path'     => $file]);
           }
+        }
+      }
+    }
+
+    $plaisioConfigPath = PlaisioXmlUtility::plaisioXmlPath('assets');
+    $helper            = new AssetsPlaisioXmlHelper($plaisioConfigPath);
+    $collections       = $helper->queryOtherAssetFileList();
+    if (!empty($collections))
+    {
+      foreach ($collections as $collection)
+      {
+        foreach ($collection['files'] as $file)
+        {
+          $this->io->logVerbose('Found asset <fso>%s</fso>', Path::join($collection['base-dir'], $file));
+
+          $this->store->insertRow('PLS_ASSET', ['ass_id'       => null,
+                                                'ass_type'     => $collection['type'],
+                                                'ass_base_dir' => $collection['base-dir'],
+                                                'ass_to_dir'   => $collection['to-dir'],
+                                                'ass_path'     => $file]);
         }
       }
     }
@@ -232,7 +288,8 @@ class AssetsCommand extends PlaisioCommand
         $this->store->insertRow('PLS_CURRENT', ['cur_id'       => null,
                                                 'cur_type'     => $data[0],
                                                 'cur_base_dir' => $data[1],
-                                                'cur_path'     => $data[2]]);
+                                                'cur_to_dir'   => $data[2],
+                                                'cur_path'     => $data[3]]);
       }
       fclose($handle);
     }
@@ -250,7 +307,7 @@ class AssetsCommand extends PlaisioCommand
 
     if (!file_exists($this->rootAssetDir))
     {
-      throw new RuntimeException("Asset root directory '%s' does not exists", $this->rootAssetDir);
+      throw new ConfigException("Asset root directory '%s' does not exists", $this->rootAssetDir);
     }
   }
 
@@ -268,7 +325,7 @@ class AssetsCommand extends PlaisioCommand
     $handle = fopen($path1, 'w');
     foreach ($assets as $asset)
     {
-      fputcsv($handle, [$asset['cur_type'], $asset['cur_base_dir'], $asset['cur_path']]);
+      fputcsv($handle, [$asset['cur_type'], $asset['cur_base_dir'], $asset['cur_to_dir'], $asset['cur_path']]);
     }
 
     $new = file_get_contents($path1);

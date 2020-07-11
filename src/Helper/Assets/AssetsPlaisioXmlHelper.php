@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 namespace Plaisio\Console\Helper\Assets;
 
-use Plaisio\Console\Helper\SourceFinderHelper;
+use Plaisio\Console\Helper\ConfigException;
+use Plaisio\Console\Helper\Fileset\Fileset;
+use Plaisio\Console\Helper\Fileset\FilesetXmlParser;
 use SetBased\Exception\RuntimeException;
 use Webmozart\PathUtil\Path;
 
@@ -14,18 +16,25 @@ class AssetsPlaisioXmlHelper
 {
   //--------------------------------------------------------------------------------------------------------------------
   /**
+   * All possible assets types.
+   *
+   * @var string[]
+   */
+  private $assetTypes = ['css', 'images', 'js'];
+
+  /**
    * The path to the plaisio.xml file.
    *
    * @var string
    */
-  protected $path;
+  private $path;
 
   /**
    * The XML of the plaisio.xml.
    *
    * @var \DOMDocument
    */
-  protected $xml;
+  private $xml;
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
@@ -50,26 +59,30 @@ class AssetsPlaisioXmlHelper
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * Returns the file lists of an asset type.
-   *
-   * @param string $type The asset type (js, css, or image).
+   * Returns the asset file lists.
    *
    * @return array
+   *
+   * @throws ConfigException
    */
-  public function queryFileList(string $type): array
+  public function queryAssetFileList(): array
   {
-    $xpath = new \DOMXpath($this->xml);
-    $list  = $xpath->query(sprintf('/assets/asset[@type="%s"]', $type));
     $files = [];
-    if ($list->length==1)
-    {
-      $dir = $list->item(0)->getAttribute('dir');
-      if ($dir==='')
-      {
-        throw new RuntimeException("Attribute '%s' of '/assets/asset/%s' in '%s' not set", 'dir', $type, $this->path);
-      }
 
-      $files = $this->queryFileListHelper($type, $dir);
+    $xpath = new \DOMXpath($this->xml);
+    $list1 = $xpath->query('/assets/asset');
+    foreach ($list1 as $node1)
+    {
+      /** @var \DOMNode $node */
+      $attributes1 = $this->parseAssetNodeAttributes($node1);
+
+      $list2 = $xpath->query('fileset', $node1);
+      foreach ($list2 as $node2)
+      {
+        $tmp           = $this->queryFileListHelper($attributes1['type'], $node2);
+        $tmp['to-dir'] = $attributes1['to-dir'];
+        $files[]       = $tmp;
+      }
     }
 
     return $files;
@@ -77,50 +90,11 @@ class AssetsPlaisioXmlHelper
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * Returns the pattern lists of an asset type.
-   *
-   * @param string $type The asset type (js, css, or image).
-   * @param string $dir
-   *
-   * @return array
-   */
-  public function queryFileListHelper(string $type, string $dir): array
-  {
-    $baseDir  = Path::join(dirname($this->path), $dir);
-    $patterns = [];
-    $xpath    = new \DOMXpath($this->xml);
-    $list     = $xpath->query(sprintf('/assets/asset[@type="%s"]/include', $type));
-    foreach ($list as $item)
-    {
-      $name = $item->getAttribute('name');
-      if ($name==='')
-      {
-        throw new RuntimeException("Attribute '%s' of '/assets/asset[@type=%s]/include' in '%s' not set",
-                                   'name',
-                                   $type,
-                                   $this->path);
-      }
-
-      $patterns[] = $name;
-    }
-
-    $helper = new SourceFinderHelper($baseDir);
-    $files  = $helper->findFiles($patterns);
-    foreach ($files as $key => $file)
-    {
-      $files[$key] = Path::makeRelative($file, $baseDir);
-    }
-
-    return ['type'     => $type,
-            'base-dir' => $baseDir,
-            'files'    => $files];
-  }
-
-  //--------------------------------------------------------------------------------------------------------------------
-  /**
    * Returns the root asset directory (a.k.a. resource directory).
    *
    * @return string
+   *
+   * @throws ConfigException
    */
   public function queryAssetsRootDir(): string
   {
@@ -129,10 +103,117 @@ class AssetsPlaisioXmlHelper
 
     if ($node===null)
     {
-      throw new RuntimeException('Root asset directory not defined in %s', $this->path);
+      throw new ConfigException('Root asset directory not defined in %s', $this->path);
     }
 
     return $node->nodeValue;
+  }
+
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
+   * Returns the asset file lists.
+   *
+   * @return array
+   *
+   * @throws ConfigException
+   */
+  public function queryOtherAssetFileList(): array
+  {
+    $files = [];
+
+    $xpath = new \DOMXpath($this->xml);
+    $list1 = $xpath->query(sprintf('/assets/other/asset'));
+    foreach ($list1 as $node1)
+    {
+      /** @var \DOMNode $node */
+      $attributes1 = $this->parseAssetNodeAttributes($node1);
+
+      $list2 = $xpath->query('fileset', $node1);
+      foreach ($list2 as $node2)
+      {
+        $tmp           = $this->queryFileListHelper($attributes1['type'], $node2);
+        $tmp['to-dir'] = $attributes1['to-dir'];
+        $files[]       = $tmp;
+      }
+    }
+
+    return $files;
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
+   * Parses the attributes of a asset node.
+   *
+   * @param \DOMNode $node The child node.
+   *
+   * @return array The attributes of the asset node.
+   *
+   * @throws ConfigException
+   */
+  private function parseAssetNodeAttributes(\DOMNode $node): array
+  {
+    $attributes = ['type'   => null,
+                   'to-dir' => null];
+
+    foreach ($node->attributes as $name => $value)
+    {
+      switch ($name)
+      {
+        case 'type':
+          $attributes['type'] = $value->value;
+          break;
+
+        case 'todir':
+          $attributes['to-dir'] = $value->value;
+          break;
+
+        default:
+          throw new ConfigException("Unexpected attribute '%s' at %s:%s", $name, $this->path, $node->getLineNo());
+      }
+    }
+
+    if ($attributes['type']===null)
+    {
+      throw new ConfigException("Mandatory attribute 'type' not set at %s:%s", $this->path, $node->getLineNo());
+    }
+
+    if (!in_array($attributes['type'], $this->assetTypes))
+    {
+      throw new ConfigException("Value '%s' of attribute 'type' not valid at %s:%s",
+                          $attributes['type'],
+                                $this->path,
+                                $node->getLineNo());
+    }
+
+    return $attributes;
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
+   * Helper method for method queryAssetFileList.
+   *
+   * @param string   $type The asset type (js, css, or image).
+   * @param \DOMNode $item The node with file set.
+   *
+   * @return array
+   *
+   * @throws ConfigException
+   */
+  private function queryFileListHelper(string $type, \DOMNode $item): array
+  {
+    $parser = new FilesetXmlParser($this->path, $item);
+    $param  = $parser->parse();
+
+    $path    = Path::join(Path::getDirectory($this->path), $param['dir']);
+    $fileset = new Fileset($path, $param['includes'], $param['excludes']);
+    $files   = $fileset->fileSet();
+
+    $baseDir = Path::join(Path::getDirectory($this->path), $param['dir']);
+
+    return ['type'     => $type,
+            'base-dir' => $baseDir,
+            'files'    => $files];
   }
 
   //--------------------------------------------------------------------------------------------------------------------

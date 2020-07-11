@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Plaisio\Console\Helper;
+namespace Plaisio\Console\Helper\Fileset;
 
 /**
  * Utility class for selecting/filtering paths against patterns.
@@ -23,7 +23,7 @@ class SelectorHelper
   public static function matchPath(string $pattern, string $path, bool $isCaseSensitive = true): bool
   {
     // Explicitly exclude directory itself.
-    if ($path=='' && $pattern=='**/*')
+    if ($path==='' && $pattern==='**/*')
     {
       return false;
     }
