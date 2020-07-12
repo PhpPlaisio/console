@@ -479,7 +479,7 @@ class TypeScriptAutomatorHelper
    **/
   private function runTypeScriptCompiler(string $path): void
   {
-    $command = ['/usr/local/bin/tsc', '-m', 'amd', '-t', 'ES6', $path];
+    $command = ['/usr/local/bin/tsc', '-m', 'amd', '-t', 'ES6', '--sourceMap', $path];
 
     $this->io->logInfo('Running: %s', implode(' ', $command));
 
