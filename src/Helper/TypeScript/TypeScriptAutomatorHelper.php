@@ -50,6 +50,20 @@ class TypeScriptAutomatorHelper
                                           'Monitor pathname for one event, then remove from watch list.']];
 
   /**
+   * The delete queue. An array of array with 2 fields: path and timestamp.
+   *
+   * @var array[]
+   */
+  private $deleteQueue;
+
+  /**
+   * The number of seconds to wait for deleting a file on the delete queue.
+   *
+   * @var int
+   */
+  private $deleteWait = 2;
+
+  /**
    * Map from watch descriptor to directory name.
    *
    * @var array<int, string>
@@ -121,6 +135,8 @@ class TypeScriptAutomatorHelper
   {
     $this->io     = $io;
     $this->jsPath = $jsPath;
+
+    $this->deleteQueue = [];
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -226,8 +242,30 @@ class TypeScriptAutomatorHelper
   {
     if (Path::hasExtension($path, $this->tsExtension))
     {
-      $this->removeFile(Path::changeExtension($path, $this->jsExtension));
-      $this->removeFile(Path::changeExtension($path, $this->mapExtension));
+      $this->pushOnDeleteQueue(Path::changeExtension($path, $this->jsExtension));
+      $this->pushOnDeleteQueue(Path::changeExtension($path, $this->mapExtension));
+    }
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
+   * Deletes files on the delete queue.
+   */
+  private function handleDeleteQueue()
+  {
+    if (!empty($this->deleteQueue))
+    {
+      $this->io->logVeryVerbose('Processing delete queue');
+
+      $time = time();
+      foreach ($this->deleteQueue as $key => $item)
+      {
+        if ($time - $item['timestamp']>=$this->deleteWait)
+        {
+          $this->removeFile($item['path']);
+          unset($this->deleteQueue[$key]);
+        }
+      }
     }
   }
 
@@ -252,47 +290,50 @@ class TypeScriptAutomatorHelper
   private function handleEvents(): void
   {
     $events = inotify_read($this->watcher);
-    foreach ($events as $event)
+    if (!empty($events))
     {
-      try
+      foreach ($events as $event)
       {
-        $path = Path::join($this->directories[$event['wd']] ?? '-', $event['name']);
-        $this->logEvent($event['mask'], $path);
-        switch (true)
+        try
         {
-          case ($event['mask'] & IN_CLOSE_WRITE)!==0:
-            $this->handleCloseWrite($path);
-            break;
+          $path = Path::join($this->directories[$event['wd']] ?? '-', $event['name']);
+          $this->logEvent($event['mask'], $path);
+          switch (true)
+          {
+            case ($event['mask'] & IN_CLOSE_WRITE)!==0:
+              $this->handleCloseWrite($path);
+              break;
 
-          case ($event['mask'] & IN_MOVED_TO)!==0:
-            $this->handleMoveTo($path);
-            break;
+            case ($event['mask'] & IN_MOVED_TO)!==0:
+              $this->handleMoveTo($path);
+              break;
 
-          case ($event['mask'] & IN_CREATE)!==0:
-            $this->handleCreate($path);
-            break;
+            case ($event['mask'] & IN_CREATE)!==0:
+              $this->handleCreate($path);
+              break;
 
-          case ($event['mask'] & IN_MOVED_FROM)!==0:
-          case ($event['mask'] & IN_DELETE)!==0:
-            $this->handleDelete($path);
-            break;
+            case ($event['mask'] & IN_MOVED_FROM)!==0:
+            case ($event['mask'] & IN_DELETE)!==0:
+              $this->handleDelete($path);
+              break;
 
-          case ($event['mask'] & IN_DELETE_SELF)!==0:
-            $this->handleDeleteSelf($path, $event['wd']);
-            break;
+            case ($event['mask'] & IN_DELETE_SELF)!==0:
+              $this->handleDeleteSelf($path, $event['wd']);
+              break;
 
-          case ($event['mask'] & IN_IGNORED)!==0:
-            // nothing to do.
-            break;
+            case ($event['mask'] & IN_IGNORED)!==0:
+              // nothing to do.
+              break;
 
-          default:
-            throw new FallenException('mask', $event['mask']);
+            default:
+              throw new FallenException('mask', $event['mask']);
+          }
         }
-      }
-      catch (\Throwable $exception)
-      {
-        $this->io->error($exception->getMessage());
-        $this->io->error($exception->getTraceAsString());
+        catch (\Throwable $exception)
+        {
+          $this->io->error($exception->getMessage());
+          $this->io->error($exception->getTraceAsString());
+        }
       }
     }
   }
@@ -324,7 +365,9 @@ class TypeScriptAutomatorHelper
   {
     $dirs = $this->initWatchersFetchDirectories();
 
-    $this->watcher     = inotify_init();
+    $this->watcher = inotify_init();
+    stream_set_blocking($this->watcher, false);
+
     $this->directories = [];
     foreach ($dirs as $dir)
     {
@@ -377,6 +420,20 @@ class TypeScriptAutomatorHelper
                                   $path);
       }
     }
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
+   * Queues a file for deletion.
+   *
+   * @param string $path
+   */
+  private function pushOnDeleteQueue(string $path): void
+  {
+    $this->io->logVeryVerbose("Queuing for delete: %s", $path);
+
+    $this->deleteQueue[] = ['path'      => $path,
+                            'timestamp' => time()];
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -459,16 +516,15 @@ class TypeScriptAutomatorHelper
       $write  = null;
       $except = null;
 
-      $n = stream_select($read, $write, $except, null);
+      $timeout = (empty($this->deleteQueue)) ? null : 1;
+      stream_select($read, $write, $except, $timeout);
 
-      if (is_array($read))
-      {
-        $this->handleEvents();
-      }
-    } while ($n>0);
+      $this->handleEvents();
+      $this->handleDeleteQueue();
+    } while (true);
   }
 
   //--------------------------------------------------------------------------------------------------------------------
-  }
+}
 
 //----------------------------------------------------------------------------------------------------------------------
