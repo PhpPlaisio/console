@@ -228,46 +228,33 @@ class AssetsCommand extends PlaisioCommand
    */
   private function findAssets(): void
   {
+    // Assets supplied by packages.
     $plaisioXmlList = PlaisioXmlUtility::findPlaisioXmlPackages('assets');
+    $collections    = [];
     foreach ($plaisioXmlList as $plaisioConfigPath)
     {
       $helper      = new AssetsPlaisioXmlHelper($plaisioConfigPath);
-      $collections = $helper->queryAssetFileList();
-      if (!empty($collections))
-      {
-        foreach ($collections as $collection)
-        {
-          foreach ($collection['files'] as $file)
-          {
-            $this->io->logVerbose('Found asset <fso>%s</fso>', Path::join($collection['base-dir'], $file));
-
-            $this->store->insertRow('PLS_ASSET', ['ass_id'       => null,
-                                                  'ass_type'     => $collection['type'],
-                                                  'ass_base_dir' => $collection['base-dir'],
-                                                  'ass_to_dir'   => $collection['to-dir'],
-                                                  'ass_path'     => $file]);
-          }
-        }
-      }
+      $tmp         = $helper->queryAssetFileList();
+      $collections = array_merge($collections, $tmp);
     }
 
+    // Third party assets.
     $plaisioConfigPath = PlaisioXmlUtility::plaisioXmlPath('assets');
     $helper            = new AssetsPlaisioXmlHelper($plaisioConfigPath);
-    $collections       = $helper->queryOtherAssetFileList();
-    if (!empty($collections))
-    {
-      foreach ($collections as $collection)
-      {
-        foreach ($collection['files'] as $file)
-        {
-          $this->io->logVerbose('Found asset <fso>%s</fso>', Path::join($collection['base-dir'], $file));
+    $tmp               = $helper->queryOtherAssetFileList();
+    $collections       = array_merge($collections, $tmp);
 
-          $this->store->insertRow('PLS_ASSET', ['ass_id'       => null,
-                                                'ass_type'     => $collection['type'],
-                                                'ass_base_dir' => $collection['base-dir'],
-                                                'ass_to_dir'   => $collection['to-dir'],
-                                                'ass_path'     => $file]);
-        }
+    foreach ($collections as $collection)
+    {
+      foreach ($collection['files'] as $file)
+      {
+        $this->io->logVerbose('Found asset <fso>%s</fso>', Path::join($collection['base-dir'], $file));
+
+        $this->store->insertRow('PLS_ASSET', ['ass_id'       => null,
+                                              'ass_type'     => $collection['type'],
+                                              'ass_base_dir' => $collection['base-dir'],
+                                              'ass_to_dir'   => $collection['to-dir'],
+                                              'ass_path'     => $file]);
       }
     }
   }
