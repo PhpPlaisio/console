@@ -329,7 +329,7 @@ class TypeScriptFixHelper
    */
   private function writeJsSource(string $path)
   {
-    if ($this->marker!==null)
+     if ($this->marker!==null)
     {
       // Add marker.
       $this->lines[] = $this->marker;
