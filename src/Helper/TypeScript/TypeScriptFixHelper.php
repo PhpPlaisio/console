@@ -130,7 +130,7 @@ class TypeScriptFixHelper
     $key     = null;
     foreach ($this->lines as $i => $line)
     {
-      if (preg_match('/^define\(\[(?<deps>[^\]]*)\],function\((?<args>[^)]*)\){$/',
+      if (preg_match('/^define\(\[(?<deps>[^]]*)],function\((?<args>[^)]*)\){$/',
                      str_replace(' ', '', $line),
                      $matches))
       {
@@ -247,7 +247,7 @@ class TypeScriptFixHelper
     $matches = null;
     foreach ($this->lines as $i => $line)
     {
-      if (preg_match('/^define\((?<name>[^\[]*),\[(?<deps>[^\]]*)\],function\((?<args>[^\)]*)\){$/',
+      if (preg_match('/^define\((?<name>[^\[]*),\[(?<deps>[^]]*)],function\((?<args>[^)]*)\){$/',
                      str_replace(' ', '', $line),
                      $matches))
       {
