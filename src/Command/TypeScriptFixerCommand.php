@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Plaisio\Console\Command;
 
 use Plaisio\Console\Helper\Assets\AssetsPlaisioXmlHelper;
+use Plaisio\Console\Helper\ConfigException;
 use Plaisio\Console\Helper\PlaisioXmlUtility;
 use Plaisio\Console\Helper\TypeScript\TypeScriptFixHelper;
 use RecursiveDirectoryIterator;
@@ -16,7 +17,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Webmozart\PathUtil\Path;
 
 /**
- * Command for coping web assets from packages to the asset (a.k.a. resources) directory.
+ * Command for fixing from TypeScript generated JavaScript files as a proper AMD module according to Plaisio standards.
  */
 class TypeScriptFixerCommand extends PlaisioCommand
 {
@@ -56,6 +57,8 @@ class TypeScriptFixerCommand extends PlaisioCommand
   //--------------------------------------------------------------------------------------------------------------------
   /**
    * @inheritdoc
+   *
+   * @throws ConfigException
    */
   protected function execute(InputInterface $input, OutputInterface $output)
   {
@@ -114,6 +117,8 @@ class TypeScriptFixerCommand extends PlaisioCommand
   //--------------------------------------------------------------------------------------------------------------------
   /**
    * Reads the asset root directory (a.k.a. the resource directory).
+   *
+   * @throws ConfigException
    */
   private function readResourceDir(): void
   {
