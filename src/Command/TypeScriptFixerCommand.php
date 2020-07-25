@@ -7,8 +7,6 @@ use Plaisio\Console\Helper\Assets\AssetsPlaisioXmlHelper;
 use Plaisio\Console\Helper\ConfigException;
 use Plaisio\Console\Helper\PlaisioXmlUtility;
 use Plaisio\Console\Helper\TypeScript\TypeScriptFixHelper;
-use RecursiveDirectoryIterator;
-use RecursiveIteratorIterator;
 use SetBased\Exception\RuntimeException;
 use SetBased\Helper\Cast;
 use Symfony\Component\Console\Input\InputArgument;
@@ -74,11 +72,7 @@ class TypeScriptFixerCommand extends PlaisioCommand
     }
     elseif (is_dir($path))
     {
-      $files = $this->collectJavaScriptFiles($path);
-      foreach ($files as $file)
-      {
-        $helper->fixJavaScriptFile($file);
-      }
+      $helper->fixJavaScriptFiles($path);
     }
     else
     {
@@ -86,32 +80,6 @@ class TypeScriptFixerCommand extends PlaisioCommand
     }
 
     return 0;
-  }
-
-  //--------------------------------------------------------------------------------------------------------------------
-  /**
-   * Collects recursively all JavaScript files under a directory.
-   *
-   * @param string $root The directory.
-   *
-   * @return array
-   */
-  private function collectJavaScriptFiles(string $root): array
-  {
-    $files = [];
-
-    $directory = new RecursiveDirectoryIterator($root);
-    $directory->setFlags(RecursiveDirectoryIterator::FOLLOW_SYMLINKS);
-    $iterator = new RecursiveIteratorIterator($directory);
-    foreach ($iterator as $path => $file)
-    {
-      if ($file->isFile() && Path::hasExtension($file->getFilename(), $this->jsExtension))
-      {
-        $files[] = $path;
-      }
-    }
-
-    return $files;
   }
 
   //--------------------------------------------------------------------------------------------------------------------

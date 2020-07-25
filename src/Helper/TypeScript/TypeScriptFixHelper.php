@@ -4,6 +4,8 @@ declare(strict_types=1);
 namespace Plaisio\Console\Helper\TypeScript;
 
 use Plaisio\Console\Style\PlaisioStyle;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
 use Webmozart\PathUtil\Path;
 
 /**
@@ -24,7 +26,14 @@ class TypeScriptFixHelper
    *
    * @var string
    */
-  private $jsPath;
+  private $jsAssetPath;
+
+  /**
+   * The file extension of JavaScript files.
+   *
+   * @var string
+   */
+  private $jsExtension = 'js';
 
   /**
    * The source code of the current JS file as lines.
@@ -54,7 +63,6 @@ class TypeScriptFixHelper
    */
   private $tsExtension = 'ts';
 
-
   //--------------------------------------------------------------------------------------------------------------------
   /**
    * Object constructor.
@@ -64,9 +72,9 @@ class TypeScriptFixHelper
    */
   public function __construct(PlaisioStyle $io, string $jsPath)
   {
-    $this->io     = $io;
-    $this->jsPath = $jsPath;
-    $this->marker = sprintf('// Modified by %s', self::class);
+    $this->io          = $io;
+    $this->jsAssetPath = $jsPath;
+    $this->marker      = sprintf('// Modified by %s', self::class);
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -110,6 +118,48 @@ class TypeScriptFixHelper
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
+   * Fixes from all TypeScript file generated JavaScript file as a proper AMD module according to Plaisio standards
+   * recursively under a directory.
+   *
+   * @param string $dir The path directory
+   */
+  public function fixJavaScriptFiles(string $dir): void
+  {
+    $paths = $this->collectJavaScriptFiles($dir);
+    foreach ($paths as $path)
+    {
+      $this->fixJavaScriptFile($path);
+    }
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
+   * Collects recursively all JavaScript files under a directory.
+   *
+   * @param string $root The directory.
+   *
+   * @return array
+   */
+  private function collectJavaScriptFiles(string $root): array
+  {
+    $files = [];
+
+    $directory = new RecursiveDirectoryIterator($root);
+    $directory->setFlags(RecursiveDirectoryIterator::FOLLOW_SYMLINKS);
+    $iterator = new RecursiveIteratorIterator($directory);
+    foreach ($iterator as $path => $file)
+    {
+      if ($file->isFile() && Path::hasExtension($file->getFilename(), $this->jsExtension))
+      {
+        $files[] = $path;
+      }
+    }
+
+    return $files;
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
    * Derives the namespace of a JS file based on its path.
    *
    * @param string $path The path to JS file.
@@ -117,7 +167,7 @@ class TypeScriptFixHelper
   private function deriveNamespace(string $path): void
   {
     $tmp             = Path::join(Path::getDirectory($path), Path::getFilenameWithoutExtension($path));
-    $this->namespace = Path::makeRelative($tmp, $this->jsPath);
+    $this->namespace = Path::makeRelative($tmp, $this->jsAssetPath);
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -329,7 +379,7 @@ class TypeScriptFixHelper
    */
   private function writeJsSource(string $path)
   {
-     if ($this->marker!==null)
+    if ($this->marker!==null)
     {
       // Add marker.
       $this->lines[] = $this->marker;

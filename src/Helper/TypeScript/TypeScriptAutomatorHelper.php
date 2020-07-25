@@ -78,18 +78,18 @@ class TypeScriptAutomatorHelper
   private $io;
 
   /**
+   * The path to the JavScript asset directory.
+   *
+   * @var string
+   */
+  private $jsAssetPath;
+
+  /**
    * The file extension of JavaScript files.
    *
    * @var string
    */
   private $jsExtension = 'js';
-
-  /**
-   * The path to the JavScript asset directory.
-   *
-   * @var string
-   */
-  private $jsPath;
 
   /**
    * The file extension of map files.
@@ -125,7 +125,6 @@ class TypeScriptAutomatorHelper
   private $watcher;
 
   //--------------------------------------------------------------------------------------------------------------------
-
   /**
    * Object constructor.
    *
@@ -134,8 +133,8 @@ class TypeScriptAutomatorHelper
    */
   public function __construct(PlaisioStyle $io, string $jsPath)
   {
-    $this->io     = $io;
-    $this->jsPath = $jsPath;
+    $this->io          = $io;
+    $this->jsAssetPath = $jsPath;
 
     $this->deleteQueue = [];
   }
@@ -148,7 +147,7 @@ class TypeScriptAutomatorHelper
   {
     $this->initWatchers();
     $this->recompileOutDated(false);
-    $this->watch(true);
+    $this->watch();
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -174,9 +173,10 @@ class TypeScriptAutomatorHelper
    */
   public function force(): void
   {
-    $this->initWatchers();
     $this->recompileOutDated(true);
-    $this->watch(false);
+
+    $helper = new TypeScriptFixHelper($this->io, $this->jsAssetPath);
+    $helper->fixJavaScriptFiles($this->jsAssetPath);
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -226,7 +226,7 @@ class TypeScriptAutomatorHelper
   {
     $files = [];
 
-    $directory = new RecursiveDirectoryIterator($this->jsPath);
+    $directory = new RecursiveDirectoryIterator($this->jsAssetPath);
     $directory->setFlags(RecursiveDirectoryIterator::FOLLOW_SYMLINKS);
     $iterator = new RecursiveIteratorIterator($directory);
     foreach ($iterator as $path => $file)
@@ -428,7 +428,7 @@ class TypeScriptAutomatorHelper
   {
     $dirs = [];
 
-    $directory = new RecursiveDirectoryIterator($this->jsPath);
+    $directory = new RecursiveDirectoryIterator($this->jsAssetPath);
     $directory->setFlags(RecursiveDirectoryIterator::FOLLOW_SYMLINKS);
     $iterator = new RecursiveIteratorIterator($directory);
     foreach ($iterator as $path => $file)
@@ -547,17 +547,15 @@ class TypeScriptAutomatorHelper
    **/
   private function runTypeScriptFixer(string $path): void
   {
-    $helper = new TypeScriptFixHelper($this->io, $this->jsPath);
+    $helper = new TypeScriptFixHelper($this->io, $this->jsAssetPath);
     $helper->fixJavaScriptFile($path);
   }
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
    * Watch the asset root directory for file events.
-   *
-   * @param bool $loop
    */
-  private function watch(bool $loop): void
+  private function watch(): void
   {
     do
     {
@@ -570,7 +568,7 @@ class TypeScriptAutomatorHelper
 
       $this->handleEvents();
       $this->handleDeleteQueue();
-    } while ($loop || !empty($this->deleteQueue));
+    } while (true);
   }
 
   //--------------------------------------------------------------------------------------------------------------------
