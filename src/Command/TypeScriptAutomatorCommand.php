@@ -8,6 +8,7 @@ use Plaisio\Console\Helper\PlaisioXmlUtility;
 use Plaisio\Console\Helper\TypeScript\TypeScriptAutomatorHelper;
 use SetBased\Exception\RuntimeException;
 use SetBased\Helper\Cast;
+use Symfony\Component\Console\Helper\DescriptorHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -34,6 +35,7 @@ class TypeScriptAutomatorCommand extends PlaisioCommand
   private $jsPath;
 
   //--------------------------------------------------------------------------------------------------------------------
+
   /**
    * @inheritdoc
    */
@@ -41,6 +43,8 @@ class TypeScriptAutomatorCommand extends PlaisioCommand
   {
     $this->setName('plaisio:type-script-automator')
          ->setDescription('Automatically compiles and fixes TypeScript files')
+         ->addOption('auto', 'a', InputOption::VALUE_NONE, 'Monitors the filesystem and automatically compiles and fixes TypeScript files')
+         ->addOption('delete', 'd', InputOption::VALUE_NONE, 'Removes compiled JavaScript files')
          ->addOption('force', 'f', InputOption::VALUE_NONE, 'Forces the recompilation of all TypeScript files');
   }
 
@@ -50,13 +54,38 @@ class TypeScriptAutomatorCommand extends PlaisioCommand
    */
   protected function execute(InputInterface $input, OutputInterface $output)
   {
-    $this->io->title('Plaisio: TypeScript Automator');
+    $auto   = Cast::toManBool($input->getOption('auto'));
+    $delete = Cast::toManBool($input->getOption('delete'));
+    $force  = Cast::toManBool($input->getOption('force'));
+    if (!$auto && !$delete && !$force)
+    {
+      $helper = new DescriptorHelper();
+      $helper->describe($output, $this);
+    }
+    else
+    {
+      $this->readResourceDir();
 
-    $force = Cast::toManBool($input->getOption('force'));
+      $this->io->title('Plaisio: TypeScript Automator');
 
-    $this->readResourceDir();
-    $helper = new TypeScriptAutomatorHelper($this->io, $this->jsPath);
-    $helper->automate($force);
+      if ($delete)
+      {
+        $helper = new TypeScriptAutomatorHelper($this->io, $this->jsPath);
+        $helper->delete();
+      }
+
+      if ($force)
+      {
+        $helper = new TypeScriptAutomatorHelper($this->io, $this->jsPath);
+        $helper->force();
+      }
+
+      if ($auto)
+      {
+        $helper = new TypeScriptAutomatorHelper($this->io, $this->jsPath);
+        $helper->automate();
+      }
+    }
 
     return 0;
   }
@@ -72,7 +101,7 @@ class TypeScriptAutomatorCommand extends PlaisioCommand
     $rootAssetDir = $helper->queryAssetsRootDir();
 
     $this->jsPath = Path::join($rootAssetDir, $this->jsDir);
-    if (!file_exists($this->jsPath))
+    if (!is_dir($this->jsPath))
     {
       throw new RuntimeException("JavaScript asset directory '%s' does not exists", $this->jsPath);
     }

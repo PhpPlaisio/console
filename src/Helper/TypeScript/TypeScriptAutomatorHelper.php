@@ -125,6 +125,7 @@ class TypeScriptAutomatorHelper
   private $watcher;
 
   //--------------------------------------------------------------------------------------------------------------------
+
   /**
    * Object constructor.
    *
@@ -142,14 +143,40 @@ class TypeScriptAutomatorHelper
   //--------------------------------------------------------------------------------------------------------------------
   /**
    * Runs the automator.
-   *
-   * @param bool $force If true all TypeScript files will be compiled unconditionally.
    */
-  public function automate(bool $force): void
+  public function automate(): void
   {
     $this->initWatchers();
-    $this->recompileOutDated($force);
-    $this->watch();
+    $this->recompileOutDated(false);
+    $this->watch(true);
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
+   * Removes all corresponding JavaScript and map files of TypeScript files.
+   */
+  public function delete(): void
+  {
+    $tsPaths = $this->collectTypeScriptFiles();
+    foreach ($tsPaths as $tsPath)
+    {
+      $paths = $this->associated($tsPath);
+      foreach ($paths as $path)
+      {
+        $this->removeFile($path);
+      }
+    }
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
+   * Compiles all TypeScript files unconditionally.
+   */
+  public function force(): void
+  {
+    $this->initWatchers();
+    $this->recompileOutDated(true);
+    $this->watch(false);
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -171,6 +198,22 @@ class TypeScriptAutomatorHelper
     $wd = inotify_add_watch($this->watcher, $path, $mask);
 
     $this->directories[$wd] = $path;
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
+   * Returns all assoicated files of a TypeScript file.
+   *
+   * @param string $path The path to the TypeScript file.
+   *
+   * @return string[]
+   */
+  private function associated(string $path): array
+  {
+    $jsPath  = Path::changeExtension($path, $this->jsExtension);
+    $mapPath = $jsPath.'.'.$this->mapExtension;
+
+    return [$jsPath, $mapPath];
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -488,7 +531,11 @@ class TypeScriptAutomatorHelper
     {
       echo implode(PHP_EOL, $lines);
 
-      $this->removeFile(Path::changeExtension($path, $this->jsExtension));
+      $paths = $this->associated($path);
+      foreach ($paths as $name)
+      {
+        $this->removeFile($name);
+      }
     }
   }
 
@@ -507,8 +554,10 @@ class TypeScriptAutomatorHelper
   //--------------------------------------------------------------------------------------------------------------------
   /**
    * Watch the asset root directory for file events.
+   *
+   * @param bool $loop
    */
-  private function watch(): void
+  private function watch(bool $loop): void
   {
     do
     {
@@ -521,7 +570,7 @@ class TypeScriptAutomatorHelper
 
       $this->handleEvents();
       $this->handleDeleteQueue();
-    } while (true);
+    } while ($loop || !empty($this->deleteQueue));
   }
 
   //--------------------------------------------------------------------------------------------------------------------

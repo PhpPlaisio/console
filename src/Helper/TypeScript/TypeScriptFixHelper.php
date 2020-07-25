@@ -47,6 +47,14 @@ class TypeScriptFixHelper
    */
   private $namespace;
 
+  /**
+   * The file extension of TypeScript files.
+   *
+   * @var string
+   */
+  private $tsExtension = 'ts';
+
+
   //--------------------------------------------------------------------------------------------------------------------
   /**
    * Object constructor.
@@ -69,31 +77,34 @@ class TypeScriptFixHelper
    */
   public function fixJavaScriptFile(string $path): void
   {
-    $this->deriveNamespace($path);
-    $this->readJsSource($path);
-
-    if (!$this->hasBeenProcessed())
+    if (file_exists(Path::changeExtension($path, $this->tsExtension)))
     {
-      if ($this->requiresFixing($path))
-      {
-        $this->io->logInfo('TypeScript fixing: <fso>%s</fso>', $path);
+      $this->deriveNamespace($path);
+      $this->readJsSource($path);
 
-        $this->fixDefine();
-        $this->fixExports1('Object.defineProperty(exports, "__esModule", { value: true });');
-        $this->fixExports1(sprintf('exports.%1$s = %1$s;', Path::getFilename($this->namespace)));
-        $this->fixExports2();
-        $this->fixReferences();
+      if (!$this->hasBeenProcessed())
+      {
+        if ($this->requiresFixing($path))
+        {
+          $this->io->logInfo('TypeScript fixing: <fso>%s</fso>', $path);
+
+          $this->fixDefine();
+          $this->fixExports1('Object.defineProperty(exports, "__esModule", { value: true });');
+          $this->fixExports1(sprintf('exports.%1$s = %1$s;', Path::getFilename($this->namespace)));
+          $this->fixExports2();
+          $this->fixReferences();
+        }
+        else
+        {
+          $this->io->logVeryVerbose("Main file doesn't require fixing: <fso>%s</fso>", $path);
+        }
+
+        $this->writeJsSource($path);
       }
       else
       {
-        $this->io->logVeryVerbose("Main file doesn't require fixing: <fso>%s</fso>", $path);
+        $this->io->logVeryVerbose('Has been TypeScript fixed already: <fso>%s</fso>', $path);
       }
-
-      $this->writeJsSource($path);
-    }
-    else
-    {
-      $this->io->logVeryVerbose('Has been TypeScript fixed already: <fso>%s</fso>', $path);
     }
   }
 
