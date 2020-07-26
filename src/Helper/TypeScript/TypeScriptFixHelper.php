@@ -174,6 +174,26 @@ class TypeScriptFixHelper
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
+   * Returns true if and only if the current JS file defines a class.
+   *
+   * @return bool
+   */
+  private function definesClass(): bool
+  {
+    $pattern = sprintf('/^\s*class\s+%s/', preg_quote($this->className));
+    foreach ($this->lines as $line)
+    {
+      if (preg_match($pattern, $line))
+      {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
    * Derives the namespace, name, and fully qualified name of the class or interface in a JS file based on its path.
    *
    * @param string $path The path to JS file.
@@ -282,8 +302,7 @@ class TypeScriptFixHelper
    */
   private function fixExports2(): void
   {
-    $pattern = sprintf('/^\s*class\s+%s/', preg_quote($this->className));
-    if (preg_match($pattern, implode(PHP_EOL, $this->lines)))
+    if ($this->definesClass())
     {
       $return = sprintf('    return %s;', $this->className);
 
