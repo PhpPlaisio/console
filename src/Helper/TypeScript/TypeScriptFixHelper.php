@@ -15,6 +15,20 @@ class TypeScriptFixHelper
 {
   //--------------------------------------------------------------------------------------------------------------------
   /**
+   * The name of the class or interface in the current JS file.
+   *
+   * @var string
+   */
+  private $className;
+
+  /**
+   * The fully qualified name of the class or interface of the current JS file.
+   *
+   * @var string
+   */
+  private $fullyQualifiedName;
+
+  /**
    * The output decorator.
    *
    * @var PlaisioStyle
@@ -50,7 +64,7 @@ class TypeScriptFixHelper
   private $marker;
 
   /**
-   * The namespace of the current JS file.
+   * The namespace of the class or interface in the current JS file.
    *
    * @var string
    */
@@ -87,7 +101,7 @@ class TypeScriptFixHelper
   {
     if (file_exists(Path::changeExtension($path, $this->tsExtension)))
     {
-      $this->deriveNamespace($path);
+      $this->deriveNaming($path);
       $this->readJsSource($path);
 
       if (!$this->hasBeenProcessed())
@@ -98,7 +112,7 @@ class TypeScriptFixHelper
 
           $this->fixDefine();
           $this->fixExports1('Object.defineProperty(exports, "__esModule", { value: true });');
-          $this->fixExports1(sprintf('exports.%1$s = %1$s;', Path::getFilename($this->namespace)));
+          $this->fixExports1(sprintf('exports.%1$s = %1$s;', $this->className));
           $this->fixExports2();
           $this->fixReferences();
         }
@@ -160,14 +174,16 @@ class TypeScriptFixHelper
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * Derives the namespace of a JS file based on its path.
+   * Derives the namespace, name, and fully qualified name of the class or interface in a JS file based on its path.
    *
    * @param string $path The path to JS file.
    */
-  private function deriveNamespace(string $path): void
+  private function deriveNaming(string $path): void
   {
-    $tmp             = Path::join(Path::getDirectory($path), Path::getFilenameWithoutExtension($path));
-    $this->namespace = Path::makeRelative($tmp, $this->jsAssetPath);
+    $tmp                      = Path::join(Path::getDirectory($path), Path::getFilenameWithoutExtension($path));
+    $this->fullyQualifiedName = Path::makeRelative($tmp, $this->jsAssetPath);
+    $this->namespace          = Path::getDirectory($this->fullyQualifiedName);
+    $this->className          = Path::getFilename($this->fullyQualifiedName);
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -194,7 +210,7 @@ class TypeScriptFixHelper
       $deps = $this->fixDefineDeps($matches['deps']);
       $args = $this->fixDefineArgs($matches['args']);
 
-      $this->lines[$key] = sprintf('define("%s", [%s], function (%s) {', $this->namespace, $deps, $args);
+      $this->lines[$key] = sprintf('define("%s", [%s], function (%s) {', $this->fullyQualifiedName, $deps, $args);
     }
   }
 
@@ -230,7 +246,7 @@ class TypeScriptFixHelper
 
       if (substr($dep, 0, 1)==='.')
       {
-        $depPath = Path::join(Path::getDirectory($this->namespace), $dep);
+        $depPath = Path::join($this->namespace, $dep);
 
         $deps[$key] = '"'.$depPath.'"';
       }
@@ -262,30 +278,34 @@ class TypeScriptFixHelper
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * Adds the return statement.
+   * Adds the return statement for classes.
    */
   private function fixExports2(): void
   {
-    $return = sprintf('    return %s;', Path::getFilename($this->namespace));
-
-    $lines = array_reverse($this->lines);
-    $key   = null;
-    foreach ($lines as $i => $line)
+    $pattern = sprintf('/^\s*class\s+%s/', preg_quote($this->className));
+    if (preg_match($pattern, implode(PHP_EOL, $this->lines)))
     {
-      $line = str_replace(' ', '', $line);
-      if ($line==='});')
+      $return = sprintf('    return %s;', $this->className);
+
+      $lines = array_reverse($this->lines);
+      $key   = null;
+      foreach ($lines as $i => $line)
       {
-        $key = $i;
-        break;
+        $line = str_replace(' ', '', $line);
+        if ($line==='});')
+        {
+          $key = $i;
+          break;
+        }
       }
-    }
 
-    if ($key!==null)
-    {
-      array_splice($lines, $key + 1, 0, [$return, '']);
-    }
+      if ($key!==null)
+      {
+        array_splice($lines, $key + 1, 0, [$return, '']);
+      }
 
-    $this->lines = array_reverse($lines);
+      $this->lines = array_reverse($lines);
+    }
   }
 
   //--------------------------------------------------------------------------------------------------------------------
