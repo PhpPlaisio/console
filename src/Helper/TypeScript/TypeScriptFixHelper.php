@@ -210,7 +210,7 @@ class TypeScriptFixHelper
   /**
    * Fix the arguments of the call of define().
    */
-  private function fixDefine()
+  private function fixDefine(): void
   {
     $matches = null;
     $key     = null;
@@ -331,7 +331,7 @@ class TypeScriptFixHelper
   /**
    * Fixes references to dependencies in the code.
    */
-  private function fixReferences()
+  private function fixReferences(): void
   {
     $matches = null;
     foreach ($this->lines as $i => $line)
@@ -385,7 +385,7 @@ class TypeScriptFixHelper
    *
    * @param string $path The path to JS file.
    */
-  private function readJsSource(string $path)
+  private function readJsSource(string $path): void
   {
     $source      = file_get_contents($path);
     $this->lines = explode(PHP_EOL, $source);
@@ -405,7 +405,7 @@ class TypeScriptFixHelper
    *
    * @return bool
    */
-  private function requiresFixing($path): bool
+  private function requiresFixing(string $path): bool
   {
     return (!str_ends_with($path, '.main.js'));
   }
@@ -416,7 +416,7 @@ class TypeScriptFixHelper
    *
    * @param string $path The path to JS file.
    */
-  private function writeJsSource(string $path)
+  private function writeJsSource(string $path): void
   {
     if ($this->marker!==null)
     {

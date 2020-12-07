@@ -185,7 +185,7 @@ class TypeScriptAutomatorHelper
    *
    * @param string $path The directory.
    */
-  private function addWatcher($path): void
+  private function addWatcher(string $path): void
   {
     $this->io->logVerbose('Watching directory %s', $path);
 
@@ -202,7 +202,7 @@ class TypeScriptAutomatorHelper
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * Returns all assoicated files of a TypeScript file.
+   * Returns all associated files of a TypeScript file.
    *
    * @param string $path The path to the TypeScript file.
    *
@@ -246,7 +246,7 @@ class TypeScriptAutomatorHelper
    *
    * @param string $path The path.
    */
-  private function handleCloseWrite(string $path)
+  private function handleCloseWrite(string $path): void
   {
     if (Path::hasExtension($path, $this->tsExtension))
     {
@@ -267,7 +267,7 @@ class TypeScriptAutomatorHelper
    *
    * @param string $path The path.
    */
-  private function handleCreate(string $path)
+  private function handleCreate(string $path): void
   {
     if (is_dir($path) && !in_array($path, $this->directories))
     {
@@ -281,7 +281,7 @@ class TypeScriptAutomatorHelper
    *
    * @param string $path The path.
    */
-  private function handleDelete(string $path)
+  private function handleDelete(string $path): void
   {
     if (Path::hasExtension($path, $this->tsExtension))
     {
@@ -294,7 +294,7 @@ class TypeScriptAutomatorHelper
   /**
    * Deletes files on the delete queue.
    */
-  private function handleDeleteQueue()
+  private function handleDeleteQueue(): void
   {
     if (!empty($this->deleteQueue))
     {
@@ -485,7 +485,7 @@ class TypeScriptAutomatorHelper
    *
    * @param bool $force If true all TypeScript files will be compiled unconditionally.
    */
-  private function recompileOutDated(bool $force)
+  private function recompileOutDated(bool $force): void
   {
     $tsPaths = $this->collectTypeScriptFiles();
     foreach ($tsPaths as $tsPath)
