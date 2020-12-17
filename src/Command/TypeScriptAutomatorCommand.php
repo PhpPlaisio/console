@@ -15,7 +15,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Webmozart\PathUtil\Path;
 
 /**
- * Command for automatically compiling and fixing of TypeScript files.
+ * Command for automatically transpiling and fixing of TypeScript files.
  */
 class TypeScriptAutomatorCommand extends PlaisioCommand
 {
@@ -35,17 +35,17 @@ class TypeScriptAutomatorCommand extends PlaisioCommand
   private $jsPath;
 
   //--------------------------------------------------------------------------------------------------------------------
-
   /**
    * @inheritdoc
    */
   protected function configure()
   {
     $this->setName('plaisio:type-script-automator')
-         ->setDescription('Automatically compiles and fixes TypeScript files')
-         ->addOption('auto', 'a', InputOption::VALUE_NONE, 'Monitors the filesystem and automatically compiles and fixes TypeScript files')
-         ->addOption('delete', 'd', InputOption::VALUE_NONE, 'Removes compiled JavaScript files')
-         ->addOption('force', 'f', InputOption::VALUE_NONE, 'Forces the recompilation of all TypeScript files');
+         ->setDescription('Automatically transpiles and fixes TypeScript files')
+         ->addOption('auto', 'a', InputOption::VALUE_NONE, 'Monitors the filesystem and automatically transpiles and fixes TypeScript files')
+         ->addOption('delete', 'd', InputOption::VALUE_NONE, 'Removes transpiled JavaScript files')
+         ->addOption('force', 'f', InputOption::VALUE_NONE, 'Transpiles all TypeScript files')
+         ->addOption('once', 'o', InputOption::VALUE_NONE, 'Transpiles TypeScript files when required only');
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -57,7 +57,8 @@ class TypeScriptAutomatorCommand extends PlaisioCommand
     $auto   = Cast::toManBool($input->getOption('auto'));
     $delete = Cast::toManBool($input->getOption('delete'));
     $force  = Cast::toManBool($input->getOption('force'));
-    if (!$auto && !$delete && !$force)
+    $once   = Cast::toManBool($input->getOption('once'));
+    if (!$auto && !$delete && !$force && !$once)
     {
       $helper = new DescriptorHelper();
       $helper->describe($output, $this);
@@ -77,13 +78,19 @@ class TypeScriptAutomatorCommand extends PlaisioCommand
       if ($force)
       {
         $helper = new TypeScriptAutomatorHelper($this->io, $this->jsPath);
-        $helper->force();
+        $helper->once(true);
       }
 
       if ($auto)
       {
         $helper = new TypeScriptAutomatorHelper($this->io, $this->jsPath);
         $helper->automate();
+      }
+
+      if ($once)
+      {
+        $helper = new TypeScriptAutomatorHelper($this->io, $this->jsPath);
+        $helper->once();
       }
     }
 

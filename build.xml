@@ -4,8 +4,21 @@
 
     <!-- Run composer update and executes various other updates -->
     <target name="update">
-        <exec command="composer update" checkreturn="true" passthru="true"/>
+        <!-- Update PHP packages -->
+        <exec executable="composer" checkreturn="true" passthru="true">
+            <arg value="--ansi"/>
+            <arg value="update"/>
+        </exec>
+
+        <!-- Generate automatically generated code -->
         <phing phingfile="build.xml" target="code-generation" haltonfailure="true"/>
+
+        <!-- Show outdated PHP packages -->
+        <exec executable="composer" checkreturn="true" passthru="true">
+            <arg value="--ansi"/>
+            <arg value="outdated"/>
+            <arg value="--direct"/>
+        </exec>
     </target>
 
     <target name="code-generation">

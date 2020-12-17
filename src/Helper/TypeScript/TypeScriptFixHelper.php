@@ -57,13 +57,6 @@ class TypeScriptFixHelper
   private $lines;
 
   /**
-   * A comment that must be appended to the file to indicate that the file has been processed.
-   *
-   * @var string
-   */
-  private $marker;
-
-  /**
    * The namespace of the class or interface in the current JS file.
    *
    * @var string
@@ -88,7 +81,6 @@ class TypeScriptFixHelper
   {
     $this->io          = $io;
     $this->jsAssetPath = $jsPath;
-    $this->marker      = sprintf('// Modified by %s', self::class);
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -376,7 +368,7 @@ class TypeScriptFixHelper
    */
   private function hasBeenProcessed(): bool
   {
-    return (end($this->lines)===$this->marker);
+    return (end($this->lines)===TypeScriptMarkHelper::getMarkUpdated());
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -418,13 +410,9 @@ class TypeScriptFixHelper
    */
   private function writeJsSource(string $path): void
   {
-    if ($this->marker!==null)
-    {
-      // Add marker.
-      $this->lines[] = $this->marker;
-      $this->lines[] = '';
-    }
-    $source = implode(PHP_EOL, $this->lines);
+    $this->lines[] = TypeScriptMarkHelper::getMarkUpdated();
+    $this->lines[] = '';
+    $source        = implode(PHP_EOL, $this->lines);
 
     file_put_contents($path, $source);
   }

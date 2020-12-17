@@ -146,7 +146,7 @@ class TypeScriptAutomatorHelper
   public function automate(): void
   {
     $this->initWatchers();
-    $this->recompileOutDated(false);
+    $this->once(false);
     $this->watch();
   }
 
@@ -169,11 +169,20 @@ class TypeScriptAutomatorHelper
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * Compiles all TypeScript files unconditionally.
+   * Transpiles TypeScript files of which the corresponding JavScript file is out of sync.
+   *
+   * @param bool $force Whether to transpile TypeScript source files unconditionally.
    */
-  public function force(): void
+  public function once(bool $force = false): void
   {
-    $this->recompileOutDated(true);
+    $tsPaths = $this->collectTypeScriptFiles();
+    foreach ($tsPaths as $tsPath)
+    {
+      if ($this->mustTranspile($tsPath) || $force)
+      {
+        $this->runTypeScriptTranspiler($tsPath);
+      }
+    }
 
     $helper = new TypeScriptFixHelper($this->io, $this->jsAssetPath);
     $helper->fixJavaScriptFiles($this->jsAssetPath);
@@ -250,7 +259,10 @@ class TypeScriptAutomatorHelper
   {
     if (Path::hasExtension($path, $this->tsExtension))
     {
-      $this->runTypeScriptCompiler($path);
+      if ($this->mustTranspile($path))
+      {
+        $this->runTypeScriptTranspiler($path);
+      }
     }
 
     if (Path::hasExtension($path, $this->jsExtension) &&
@@ -396,7 +408,7 @@ class TypeScriptAutomatorHelper
 
     if (is_file($path) && Path::hasExtension($path, $this->tsExtension))
     {
-      $this->runTypeScriptCompiler($path);
+      $this->runTypeScriptTranspiler($path);
     }
   }
 
@@ -467,6 +479,28 @@ class TypeScriptAutomatorHelper
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
+   * Return whether a TypeScript file must e transpiled.
+   *
+   * @param string $tsPath The path to the TypeScript file.
+   *
+   * @return bool
+   */
+  private function mustTranspile(string $tsPath): bool
+  {
+    $jsPath = Path::changeExtension($tsPath, $this->jsExtension);
+    if (!file_exists($jsPath))
+    {
+      return true;
+    }
+
+    $tsHash = TypeScriptMarkHelper::addHashToTypeScriptSource($tsPath);
+    $jsHash = TypeScriptMarkHelper::extractHashFromSource($jsPath);
+
+    return ($tsHash!==$jsHash);
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
    * Queues a file for deletion.
    *
    * @param string $path
@@ -477,25 +511,6 @@ class TypeScriptAutomatorHelper
 
     $this->deleteQueue[] = ['path'      => $path,
                             'timestamp' => time()];
-  }
-
-  //--------------------------------------------------------------------------------------------------------------------
-  /**
-   * Compiles TypeScript file of which the corresponding JavScript file is missing or older.
-   *
-   * @param bool $force If true all TypeScript files will be compiled unconditionally.
-   */
-  private function recompileOutDated(bool $force): void
-  {
-    $tsPaths = $this->collectTypeScriptFiles();
-    foreach ($tsPaths as $tsPath)
-    {
-      $jsPath = Path::changeExtension($tsPath, $this->jsExtension);
-      if ($force || !is_file($jsPath) || (filemtime($tsPath)>=filemtime($jsPath)))
-      {
-        $this->runTypeScriptCompiler($tsPath);
-      }
-    }
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -516,11 +531,11 @@ class TypeScriptAutomatorHelper
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * Runs the TypeScript Compiler (tsc) on a TypeScript file.
+   * Runs the TypeScript transpiler (tsc) on a TypeScript file.
    *
    * @param string $path The path to the JavScript file.
    **/
-  private function runTypeScriptCompiler(string $path): void
+  private function runTypeScriptTranspiler(string $path): void
   {
     $command = ['/usr/local/bin/tsc', '-m', 'amd', '-t', 'ES6', '--sourceMap', $path];
 
