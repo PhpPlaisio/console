@@ -11,4 +11,4 @@ requirejs.config({
 //----------------------------------------------------------------------------------------------------------------------
 // @ts-ignore
 require(["Plaisio/PageDecorator/CorePageDecorator"]);
-// Modified by Plaisio\Console\Helper\TypeScript\TypeScriptFixHelper
+// Plaisio\Console\Helper\TypeScript\TypeScriptMarkHelper::updated

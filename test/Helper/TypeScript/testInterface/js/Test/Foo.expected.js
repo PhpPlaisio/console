@@ -2,4 +2,4 @@ define("../../testInterface/js/Test/Foo", ["require", "exports"], function (requ
     "use strict";
 
 });
-// Modified by Plaisio\Console\Helper\TypeScript\TypeScriptFixHelper
+// Plaisio\Console\Helper\TypeScript\TypeScriptMarkHelper::updated

@@ -8,4 +8,4 @@ define("Test/Foo", ["require", "exports", "Test/Foo", "Test/Bar", "Test/Eggs", "
 
     return Foo;
 });
-// Modified by Plaisio\Console\Helper\TypeScript\TypeScriptFixHelper
+// Plaisio\Console\Helper\TypeScript\TypeScriptMarkHelper::updated
