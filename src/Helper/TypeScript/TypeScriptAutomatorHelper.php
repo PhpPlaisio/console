@@ -6,7 +6,6 @@ namespace Plaisio\Console\Helper\TypeScript;
 use Plaisio\Console\Style\PlaisioStyle;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
-use SetBased\Exception\FallenException;
 use SetBased\Helper\ProgramExecution;
 use Webmozart\PathUtil\Path;
 
@@ -48,20 +47,6 @@ class TypeScriptAutomatorHelper
                                           'Add events to watch mask for this pathname if it already exists (instead of replacing mask).'],
                            2147483648 => ['IN_ONESHOT',
                                           'Monitor pathname for one event, then remove from watch list.']];
-
-  /**
-   * The delete queue. An array of array with 2 fields: path and timestamp.
-   *
-   * @var array[]
-   */
-  private $deleteQueue;
-
-  /**
-   * The number of seconds to wait for deleting a file on the delete queue.
-   *
-   * @var int
-   */
-  private $deleteWait = 2;
 
   /**
    * Map from watch descriptor to directory name.
@@ -111,6 +96,13 @@ class TypeScriptAutomatorHelper
                        IN_DELETE_SELF];
 
   /**
+   * Timeout waiting for inotify and start "manual" inspections of TypeScript and JavaScript files.
+   *
+   * @var int
+   */
+  private $timeout = 10;
+
+  /**
    * The file extension of TypeScript files.
    *
    * @var string
@@ -125,6 +117,7 @@ class TypeScriptAutomatorHelper
   private $watcher;
 
   //--------------------------------------------------------------------------------------------------------------------
+
   /**
    * Object constructor.
    *
@@ -146,7 +139,7 @@ class TypeScriptAutomatorHelper
   public function automate(): void
   {
     $this->initWatchers();
-    $this->once(false);
+    $this->once();
     $this->watch();
   }
 
@@ -297,30 +290,8 @@ class TypeScriptAutomatorHelper
   {
     if (Path::hasExtension($path, $this->tsExtension))
     {
-      $this->pushOnDeleteQueue(Path::changeExtension($path, $this->jsExtension));
-      $this->pushOnDeleteQueue(Path::changeExtension($path, $this->mapExtension));
-    }
-  }
-
-  //--------------------------------------------------------------------------------------------------------------------
-  /**
-   * Deletes files on the delete queue.
-   */
-  private function handleDeleteQueue(): void
-  {
-    if (!empty($this->deleteQueue))
-    {
-      $this->io->logVeryVerbose('Processing delete queue');
-
-      $time = time();
-      foreach ($this->deleteQueue as $key => $item)
-      {
-        if ($time - $item['timestamp']>=$this->deleteWait)
-        {
-          $this->removeFile($item['path']);
-          unset($this->deleteQueue[$key]);
-        }
-      }
+      $this->removeFile(Path::changeExtension($path, $this->jsExtension));
+      $this->removeFile(Path::changeExtension($path, $this->mapExtension));
     }
   }
 
@@ -355,6 +326,7 @@ class TypeScriptAutomatorHelper
           $this->logEvent($event['mask'], $path);
           switch (true)
           {
+            case ($event['mask'] & IN_MODIFY)!==0:
             case ($event['mask'] & IN_CLOSE_WRITE)!==0:
               $this->handleCloseWrite($path);
               break;
@@ -381,7 +353,7 @@ class TypeScriptAutomatorHelper
               break;
 
             default:
-              throw new FallenException('mask', $event['mask']);
+              // throw new FallenException('mask', $event['mask']);
           }
         }
         catch (\Throwable $exception)
@@ -399,7 +371,8 @@ class TypeScriptAutomatorHelper
    *
    * @param string $path The path.
    */
-  private function handleMoveTo(string $path): void
+  private
+  function handleMoveTo(string $path): void
   {
     if (is_dir($path) && !in_array($path, $this->directories))
     {
@@ -416,7 +389,8 @@ class TypeScriptAutomatorHelper
   /**
    * Initializes watchers for all directories recursively under the asset root.
    */
-  private function initWatchers(): void
+  private
+  function initWatchers(): void
   {
     $dirs = $this->initWatchersFetchDirectories();
 
@@ -436,7 +410,8 @@ class TypeScriptAutomatorHelper
    *
    * @return array All found directories.
    */
-  private function initWatchersFetchDirectories(): array
+  private
+  function initWatchersFetchDirectories(): array
   {
     $dirs = [];
 
@@ -461,7 +436,8 @@ class TypeScriptAutomatorHelper
    * @param int    $mask The INOTIFY constant.
    * @param string $path The path.
    */
-  private function logEvent(int $mask, string $path): void
+  private
+  function logEvent(int $mask, string $path): void
   {
     foreach ($this->myEvents as $tmp)
     {
@@ -485,7 +461,8 @@ class TypeScriptAutomatorHelper
    *
    * @return bool
    */
-  private function mustTranspile(string $tsPath): bool
+  private
+  function mustTranspile(string $tsPath): bool
   {
     $jsPath = Path::changeExtension($tsPath, $this->jsExtension);
     if (!file_exists($jsPath))
@@ -501,25 +478,12 @@ class TypeScriptAutomatorHelper
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * Queues a file for deletion.
-   *
-   * @param string $path
-   */
-  private function pushOnDeleteQueue(string $path): void
-  {
-    $this->io->logVeryVerbose("Queuing for delete: %s", $path);
-
-    $this->deleteQueue[] = ['path'      => $path,
-                            'timestamp' => time()];
-  }
-
-  //--------------------------------------------------------------------------------------------------------------------
-  /**
    * Removes a file.
    *
    * @param string $path The path to the file.
    */
-  private function removeFile(string $path): void
+  private
+  function removeFile(string $path): void
   {
     if (is_file($path))
     {
@@ -531,13 +495,34 @@ class TypeScriptAutomatorHelper
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
+   * Runs the TypeScript Fixer on a JavaScript file.
+   *
+   * @param string $path The path to the JavScript file.
+   **/
+  private
+  function runTypeScriptFixer(string $path): void
+  {
+    $helper = new TypeScriptFixHelper($this->io, $this->jsAssetPath);
+    $helper->fixJavaScriptFile($path);
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
    * Runs the TypeScript transpiler (tsc) on a TypeScript file.
    *
    * @param string $path The path to the JavScript file.
    **/
-  private function runTypeScriptTranspiler(string $path): void
+  private
+  function runTypeScriptTranspiler(string $path): void
   {
-    $command = ['/usr/local/bin/tsc', '-m', 'amd', '-t', 'ES6', '--sourceMap', $path];
+    $command = ['node_modules/typescript/bin/tsc',
+                '-m',
+                'amd',
+                '-t',
+                'ES2015',
+                '--strict',
+                '--sourceMap',
+                $path];
 
     $this->io->logInfo('Running: %s', implode(' ', $command));
 
@@ -556,21 +541,10 @@ class TypeScriptAutomatorHelper
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * Runs the TypeScript Fixer on a JavaScript file.
-   *
-   * @param string $path The path to the JavScript file.
-   **/
-  private function runTypeScriptFixer(string $path): void
-  {
-    $helper = new TypeScriptFixHelper($this->io, $this->jsAssetPath);
-    $helper->fixJavaScriptFile($path);
-  }
-
-  //--------------------------------------------------------------------------------------------------------------------
-  /**
    * Watch the asset root directory for file events.
    */
-  private function watch(): void
+  private
+  function watch(): void
   {
     do
     {
@@ -578,14 +552,19 @@ class TypeScriptAutomatorHelper
       $write  = null;
       $except = null;
 
-      $timeout = (empty($this->deleteQueue)) ? null : 1;
-      stream_select($read, $write, $except, $timeout);
+      stream_select($read, $write, $except, $this->timeout);
 
-      $this->handleEvents();
-      $this->handleDeleteQueue();
+      if (inotify_queue_len($this->watcher)>0)
+      {
+        $this->handleEvents();
+      }
+      else
+      {
+        // Handle possible changed files not notified by inotify (e.g. nfs mounted filesystems).
+        $this->once();
+      }
     } while (true);
   }
-
   //--------------------------------------------------------------------------------------------------------------------
 }
 
