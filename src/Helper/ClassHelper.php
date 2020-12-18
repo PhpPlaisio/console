@@ -20,7 +20,7 @@ class ClassHelper
    *
    * @return int
    */
-  public static function classDeclarationLine(array $lines, $class): int
+  public static function classDeclarationLine(array $lines, string $class): int
   {
     $pattern = sprintf('/(\w\s+)?class\s+%s/', preg_quote($class));
     $line    = self::searchPattern($lines, $pattern);
