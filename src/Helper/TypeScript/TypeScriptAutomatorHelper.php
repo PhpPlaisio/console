@@ -128,8 +128,6 @@ class TypeScriptAutomatorHelper
   {
     $this->io          = $io;
     $this->jsAssetPath = $jsPath;
-
-    $this->deleteQueue = [];
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -326,7 +324,6 @@ class TypeScriptAutomatorHelper
           $this->logEvent($event['mask'], $path);
           switch (true)
           {
-            case ($event['mask'] & IN_MODIFY)!==0:
             case ($event['mask'] & IN_CLOSE_WRITE)!==0:
               $this->handleCloseWrite($path);
               break;
