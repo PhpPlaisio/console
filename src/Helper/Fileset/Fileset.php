@@ -110,7 +110,7 @@ class Fileset
    *
    * @return bool
    */
-  private function match($path, array $patterns): bool
+  private function match(string $path, array $patterns): bool
   {
     foreach ($patterns as $pattern)
     {
