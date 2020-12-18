@@ -20,21 +20,21 @@ class AssetsPlaisioXmlHelper
    *
    * @var string[]
    */
-  private $assetTypes = ['css', 'images', 'js'];
+  private array $assetTypes = ['css', 'images', 'js'];
 
   /**
    * The path to the plaisio.xml file.
    *
    * @var string
    */
-  private $path;
+  private string $path;
 
   /**
    * The XML of the plaisio.xml.
    *
    * @var \DOMDocument
    */
-  private $xml;
+  private \DOMDocument $xml;
 
   //--------------------------------------------------------------------------------------------------------------------
   /**

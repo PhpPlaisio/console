@@ -19,21 +19,21 @@ class Fileset
    *
    * @var string
    */
-  private $dir;
+  private string $dir;
 
   /**
    * The exclude patterns.
    *
    * @var array
    */
-  private $excludes;
+  private array $excludes;
 
   /**
    *  The include patterns.
    *
    * @var array
    */
-  private $includes;
+  private array $includes;
 
   //--------------------------------------------------------------------------------------------------------------------
   /**

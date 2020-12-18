@@ -25,21 +25,21 @@ class TypeScriptFixerCommand extends PlaisioCommand
    *
    * @var string
    */
-  public $jsDir = 'js';
+  public string $jsDir = 'js';
 
   /**
    * The file extension of JavaScript files.
    *
    * @var string
    */
-  private $jsExtension = 'js';
+  private string $jsExtension = 'js';
 
   /**
    * The path to the JavScript asset directory.
    *
    * @var string
    */
-  private $jsPath;
+  private string $jsPath;
 
   //--------------------------------------------------------------------------------------------------------------------
   /**

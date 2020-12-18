@@ -19,56 +19,56 @@ class TypeScriptFixHelper
    *
    * @var string
    */
-  private $className;
+  private string $className;
 
   /**
    * The fully qualified name of the class or interface of the current JS file.
    *
    * @var string
    */
-  private $fullyQualifiedName;
+  private string $fullyQualifiedName;
 
   /**
    * The output decorator.
    *
    * @var PlaisioStyle
    */
-  private $io;
+  private PlaisioStyle $io;
 
   /**
    * The path to the JavaScript assets directory.
    *
    * @var string
    */
-  private $jsAssetPath;
+  private string $jsAssetPath;
 
   /**
    * The file extension of JavaScript files.
    *
    * @var string
    */
-  private $jsExtension = 'js';
+  private string $jsExtension = 'js';
 
   /**
    * The source code of the current JS file as lines.
    *
    * @var string[]
    */
-  private $lines;
+  private array $lines;
 
   /**
    * The namespace of the class or interface in the current JS file.
    *
    * @var string
    */
-  private $namespace;
+  private string $namespace;
 
   /**
    * The file extension of TypeScript files.
    *
    * @var string
    */
-  private $tsExtension = 'ts';
+  private string $tsExtension = 'ts';
 
   //--------------------------------------------------------------------------------------------------------------------
   /**

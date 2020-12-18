@@ -16,7 +16,7 @@ trait PlaisioKernelCommand
    *
    * @var PlaisioKernel
    */
-  protected $nub;
+  protected PlaisioKernel $nub;
 
   //--------------------------------------------------------------------------------------------------------------------
   /**

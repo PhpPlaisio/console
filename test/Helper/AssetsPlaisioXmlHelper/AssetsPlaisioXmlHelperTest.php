@@ -19,7 +19,7 @@ class AssetsPlaisioXmlHelperTest extends TestCase
   public function testValidAssets(): void
   {
     $path   = Path::join(Path::makeRelative(__DIR__, getcwd()), __FUNCTION__, 'plaisio-assets.xml');
-    $helper = new AssetsPlaisioXmlHelper($path, ['css', 'js', 'images']);
+    $helper = new AssetsPlaisioXmlHelper($path);
 
     $files = $helper->queryAssetFileList();
     self::assertEquals([['type'     => 'js',
@@ -40,7 +40,7 @@ class AssetsPlaisioXmlHelperTest extends TestCase
   public function testValidOtherAssets(): void
   {
     $path   = Path::join(Path::makeRelative(__DIR__, getcwd()), __FUNCTION__, 'plaisio-assets.xml');
-    $helper = new AssetsPlaisioXmlHelper($path, ['css', 'js', 'images']);
+    $helper = new AssetsPlaisioXmlHelper($path);
 
     $files = $helper->queryOtherAssetFileList();
     self::assertEquals([['type'     => 'js',

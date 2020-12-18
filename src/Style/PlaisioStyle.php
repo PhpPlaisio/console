@@ -45,7 +45,7 @@ class PlaisioStyle extends SymfonyStyle
   /**
    * Writes a debug message.
    */
-  public function logDebug()
+  public function logDebug(): void
   {
     if ($this->getVerbosity()>=OutputInterface::VERBOSITY_DEBUG)
     {
@@ -56,9 +56,9 @@ class PlaisioStyle extends SymfonyStyle
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * Writes an infomation message.
+   * Writes an information message.
    */
-  public function logInfo()
+  public function logInfo(): void
   {
     if ($this->getVerbosity()>=OutputInterface::VERBOSITY_NORMAL)
     {
@@ -71,7 +71,7 @@ class PlaisioStyle extends SymfonyStyle
   /**
    * Writes a notification message.
    */
-  public function logNote()
+  public function logNote(): void
   {
     if ($this->getVerbosity()>=OutputInterface::VERBOSITY_NORMAL)
     {
@@ -84,7 +84,7 @@ class PlaisioStyle extends SymfonyStyle
   /**
    * Writes a verbose message.
    */
-  public function logVerbose()
+  public function logVerbose(): void
   {
     if ($this->getVerbosity()>=OutputInterface::VERBOSITY_VERBOSE)
     {
@@ -97,7 +97,7 @@ class PlaisioStyle extends SymfonyStyle
   /**
    * Writes a very verbose message.
    */
-  public function logVeryVerbose()
+  public function logVeryVerbose(): void
   {
     if ($this->getVerbosity()>=OutputInterface::VERBOSITY_VERY_VERBOSE)
     {

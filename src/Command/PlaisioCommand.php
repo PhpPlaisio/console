@@ -19,7 +19,7 @@ abstract class PlaisioCommand extends Command
    *
    * @var PlaisioStyle
    */
-  protected $io;
+  protected PlaisioStyle $io;
 
   //--------------------------------------------------------------------------------------------------------------------
   /**

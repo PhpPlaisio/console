@@ -23,37 +23,37 @@ class FilesetXmlParser
   /**
    * The directory of the fileset.
    *
-   * @var string
+   * @var string|null
    */
-  private $dir = null;
+  private ?string $dir = null;
 
   /**
    * The exclude patterns.
    *
    * @var array
    */
-  private $excludes = [];
+  private array $excludes = [];
 
   /**
    * The include patterns.
    *
    * @var array
    */
-  private $includes = [];
+  private array $includes = [];
 
   /**
    * The DOM node with the fileset.
    *
    * @var \DOMNode
    */
-  private $node;
+  private \DOMNode $node;
 
   /**
    * The path to the XML file.
    *
    * @var string
    */
-  private $path;
+  private string $path;
 
   //--------------------------------------------------------------------------------------------------------------------
   /**

@@ -22,21 +22,21 @@ class AssetsCommand extends PlaisioCommand
    *
    * @var int[]
    */
-  private $count = ['new' => 0, 'current' => 0, 'old' => 0];
+  private array $count = ['new' => 0, 'current' => 0, 'old' => 0];
 
   /**
    * The asset root directory (a.k.a. teh resource directory). The parent directory for all asset types.
    *
    * @var string
    */
-  private $rootAssetDir;
+  private string $rootAssetDir;
 
   /**
    * The volatile asset store.
    *
    * @var AssetsStore
    */
-  private $store;
+  private AssetsStore $store;
 
   //--------------------------------------------------------------------------------------------------------------------
   /**

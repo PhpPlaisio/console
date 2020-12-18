@@ -16,14 +16,14 @@ class PlaisioXmlHelper
    *
    * @var string
    */
-  protected $path;
+  protected string $path;
 
   /**
    * The XML of the plaisio.xml.
    *
    * @var \DOMDocument
    */
-  protected $xml;
+  protected \DOMDocument $xml;
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
