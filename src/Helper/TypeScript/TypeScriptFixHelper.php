@@ -258,9 +258,13 @@ class TypeScriptFixHelper
 
       if (substr($dep, 0, 1)==='.')
       {
-        $depPath = Path::join($this->namespace, $dep);
-
+        $depPath    = Path::join($this->namespace, $dep);
         $deps[$key] = '"'.$depPath.'"';
+      }
+      elseif (Path::hasExtension($dep, 'js'))
+      {
+        $dep        = Path::getFilenameWithoutExtension($dep, 'js');
+        $deps[$key] = '"'.$dep.'"';
       }
     }
 
