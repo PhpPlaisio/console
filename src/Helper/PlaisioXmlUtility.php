@@ -89,7 +89,7 @@ class PlaisioXmlUtility
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * Returns the relative path of path if the path is below the cwd. Otherwise returns the path unmodified.
+   * Returns the relative path of path if the path is below the cwd. Otherwise, returns the path unmodified.
    *
    * @param string $path The path.
    *
@@ -115,7 +115,7 @@ class PlaisioXmlUtility
    */
   public static function vendorDir(): string
   {
-    return self::relativePath(dirname(dirname(dirname(dirname(__DIR__)))));
+    return self::relativePath(dirname(__DIR__, 4));
   }
 
   //--------------------------------------------------------------------------------------------------------------------

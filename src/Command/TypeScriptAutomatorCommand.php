@@ -21,18 +21,11 @@ class TypeScriptAutomatorCommand extends PlaisioCommand
 {
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * The directory under root asset directory for JS files.
-   *
-   * @var string
-   */
-  public $jsDir = 'js';
-
-  /**
    * The path to the JavScript asset directory.
    *
    * @var string
    */
-  private $jsPath;
+  private string $jsPath;
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
@@ -105,9 +98,7 @@ class TypeScriptAutomatorCommand extends PlaisioCommand
   {
     $path         = PlaisioXmlUtility::plaisioXmlPath('assets');
     $helper       = new AssetsPlaisioXmlHelper($path);
-    $rootAssetDir = $helper->queryAssetsRootDir();
-
-    $this->jsPath = Path::join($rootAssetDir, $this->jsDir);
+    $this->jsPath = $helper->queryAssetDir('js');
     if (!is_dir($this->jsPath))
     {
       throw new RuntimeException("JavaScript asset directory '%s' does not exists", $this->jsPath);

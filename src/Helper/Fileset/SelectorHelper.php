@@ -10,13 +10,13 @@ class SelectorHelper
 {
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * Tests whether or not a given path matches a given pattern.
+   * Tests whether a path matches a pattern.
    *
    * (This method is heavily inspired by SelectorUtils::matchPath from phing.)
    *
    * @param string $pattern         The pattern to match against.
    * @param string $path            The path to match.
-   * @param bool   $isCaseSensitive Whether or not matching should be performed case sensitively.
+   * @param bool   $isCaseSensitive Whether matching should be performed case sensitively.
    *
    * @return bool
    */

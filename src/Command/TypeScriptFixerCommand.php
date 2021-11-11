@@ -21,13 +21,6 @@ class TypeScriptFixerCommand extends PlaisioCommand
 {
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * The directory under root asset directory for JS files.
-   *
-   * @var string
-   */
-  public string $jsDir = 'js';
-
-  /**
    * The file extension of JavaScript files.
    *
    * @var string
@@ -92,9 +85,7 @@ class TypeScriptFixerCommand extends PlaisioCommand
   {
     $path         = PlaisioXmlUtility::plaisioXmlPath('assets');
     $helper       = new AssetsPlaisioXmlHelper($path);
-    $rootAssetDir = $helper->queryAssetsRootDir();
-
-    $this->jsPath = Path::join($rootAssetDir, $this->jsDir);
+    $this->jsPath = $helper->queryAssetDir('js');
     if (!file_exists($this->jsPath))
     {
       throw new RuntimeException("JavaScript asset directory '%s' does not exists", $this->jsPath);
