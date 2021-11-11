@@ -3,6 +3,7 @@
 /bin/composer
 /bin/jsonlint
 /bin/phing
+/bin/php-parse
 /bin/phpunit
 /bin/stratum
 /composer.lock
