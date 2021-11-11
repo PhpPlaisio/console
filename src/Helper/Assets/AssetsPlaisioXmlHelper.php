@@ -59,6 +59,30 @@ class AssetsPlaisioXmlHelper
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
+   * Returns the asset directory of an asset type.
+   *
+   * @param string $type The asset type.
+   *
+   * @return string
+   *
+   * @throws ConfigException
+   */
+  public function queryAssetDir(string $type): string
+  {
+    $xpath = new \DOMXpath($this->xml);
+    $root  = $xpath->query('/assets/root')->item(0);
+    if ($root===null)
+    {
+      throw new ConfigException('Root asset directory (/assets/root) not defined in %s', $this->path);
+    }
+
+    $attr = $root->attributes->getNamedItem($type);
+
+    return Path::join($root->nodeValue, ($attr===null) ? $type : $attr->nodeValue);
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
    * Returns the asset file lists.
    *
    * @return array
@@ -73,7 +97,7 @@ class AssetsPlaisioXmlHelper
     $list1 = $xpath->query('/assets/asset');
     foreach ($list1 as $node1)
     {
-      /** @var \DOMNode $node */
+      /** @var \DOMNode $attributes1 */
       $attributes1 = $this->parseAssetNodeAttributes($node1);
 
       $list2 = $xpath->query('fileset', $node1);
@@ -100,7 +124,6 @@ class AssetsPlaisioXmlHelper
   {
     $xpath = new \DOMXpath($this->xml);
     $node  = $xpath->query('/assets/root')->item(0);
-
     if ($node===null)
     {
       throw new ConfigException('Root asset directory not defined in %s', $this->path);
@@ -108,7 +131,6 @@ class AssetsPlaisioXmlHelper
 
     return $node->nodeValue;
   }
-
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
@@ -123,10 +145,10 @@ class AssetsPlaisioXmlHelper
     $files = [];
 
     $xpath = new \DOMXpath($this->xml);
-    $list1 = $xpath->query(sprintf('/assets/other/asset'));
+    $list1 = $xpath->query('/assets/other/asset');
     foreach ($list1 as $node1)
     {
-      /** @var \DOMNode $node */
+      /** @var \DOMNode $attributes1 */
       $attributes1 = $this->parseAssetNodeAttributes($node1);
 
       $list2 = $xpath->query('fileset', $node1);
@@ -181,7 +203,7 @@ class AssetsPlaisioXmlHelper
     if (!in_array($attributes['type'], $this->assetTypes))
     {
       throw new ConfigException("Value '%s' of attribute 'type' not valid at %s:%s",
-                          $attributes['type'],
+                                $attributes['type'],
                                 $this->path,
                                 $node->getLineNo());
     }
