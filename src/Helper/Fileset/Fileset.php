@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Plaisio\Console\Helper\Fileset;
 
+use FilesystemIterator;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use Webmozart\PathUtil\Path;
@@ -85,7 +86,7 @@ class Fileset
     $files = [];
 
     $directory = new RecursiveDirectoryIterator($this->dir);
-    $directory->setFlags(RecursiveDirectoryIterator::FOLLOW_SYMLINKS);
+    $directory->setFlags(FilesystemIterator::FOLLOW_SYMLINKS);
     $iterator = new RecursiveIteratorIterator($directory);
     foreach ($iterator as $path => $file)
     {

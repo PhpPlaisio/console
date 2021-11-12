@@ -12,7 +12,6 @@ use Symfony\Component\Console\Helper\DescriptorHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Webmozart\PathUtil\Path;
 
 /**
  * Command for automatically transpiling and fixing of TypeScript files.

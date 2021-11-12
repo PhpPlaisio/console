@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Plaisio\Console\Helper\TypeScript;
 
+use FilesystemIterator;
 use Plaisio\Console\Style\PlaisioStyle;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
@@ -228,7 +229,7 @@ class TypeScriptAutomatorHelper
     $files = [];
 
     $directory = new RecursiveDirectoryIterator($this->jsAssetPath);
-    $directory->setFlags(RecursiveDirectoryIterator::FOLLOW_SYMLINKS);
+    $directory->setFlags(FilesystemIterator::FOLLOW_SYMLINKS);
     $iterator = new RecursiveIteratorIterator($directory);
     foreach ($iterator as $path => $file)
     {
@@ -414,7 +415,7 @@ class TypeScriptAutomatorHelper
     $dirs = [];
 
     $directory = new RecursiveDirectoryIterator($this->jsAssetPath);
-    $directory->setFlags(RecursiveDirectoryIterator::FOLLOW_SYMLINKS);
+    $directory->setFlags(FilesystemIterator::FOLLOW_SYMLINKS);
     $iterator = new RecursiveIteratorIterator($directory);
     foreach ($iterator as $path => $file)
     {

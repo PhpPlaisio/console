@@ -139,9 +139,8 @@ class TypeScriptMarkHelper
   private static function sourceAsLines(string $path): array
   {
     $lines = explode(PHP_EOL, file_get_contents($path));
-    $lines = self::removeEmptyTrainingLines($lines);
 
-    return $lines;
+    return self::removeEmptyTrainingLines($lines);
   }
 
   //--------------------------------------------------------------------------------------------------------------------

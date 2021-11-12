@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Plaisio\Console\Helper\TypeScript;
 
+use FilesystemIterator;
 use Plaisio\Console\Style\PlaisioStyle;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
@@ -151,7 +152,7 @@ class TypeScriptFixHelper
     $files = [];
 
     $directory = new RecursiveDirectoryIterator($root);
-    $directory->setFlags(RecursiveDirectoryIterator::FOLLOW_SYMLINKS);
+    $directory->setFlags(FilesystemIterator::FOLLOW_SYMLINKS);
     $iterator = new RecursiveIteratorIterator($directory);
     foreach ($iterator as $path => $file)
     {
@@ -330,7 +331,7 @@ class TypeScriptFixHelper
   private function fixReferences(): void
   {
     $matches = null;
-    foreach ($this->lines as $i => $line)
+    foreach ($this->lines as $line)
     {
       if (preg_match('/^define\((?<name>[^\[]*),\[(?<deps>[^]]*)],function\((?<args>[^)]*)\){$/',
                      str_replace(' ', '', $line),
