@@ -6,7 +6,7 @@ namespace Plaisio\Console\Test\Helper\TypeScript;
 use PHPUnit\Framework\TestCase;
 use Plaisio\Console\Application\PlaisioApplication;
 use Symfony\Component\Console\Tester\ApplicationTester;
-use Webmozart\PathUtil\Path;
+use Symfony\Component\Filesystem\Path;
 
 /**
  * Test cases for class TypeScriptFixHelper.

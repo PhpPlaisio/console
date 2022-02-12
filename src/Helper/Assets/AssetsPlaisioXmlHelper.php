@@ -7,7 +7,7 @@ use Plaisio\Console\Helper\ConfigException;
 use Plaisio\Console\Helper\Fileset\Fileset;
 use Plaisio\Console\Helper\Fileset\FilesetXmlParser;
 use SetBased\Exception\RuntimeException;
-use Webmozart\PathUtil\Path;
+use Symfony\Component\Filesystem\Path;
 
 /**
  * Helper class for retrieving information from plaisio-assets.xml files.

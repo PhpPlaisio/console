@@ -8,7 +8,7 @@ use Plaisio\Console\Style\PlaisioStyle;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use SetBased\Helper\ProgramExecution;
-use Webmozart\PathUtil\Path;
+use Symfony\Component\Filesystem\Path;
 
 /**
  *  Watch the asset root directory for file events related to TypeScript files.

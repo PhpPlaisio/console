@@ -7,7 +7,7 @@ use FilesystemIterator;
 use Plaisio\Console\Style\PlaisioStyle;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
-use Webmozart\PathUtil\Path;
+use Symfony\Component\Filesystem\Path;
 
 /**
  * Fixes from a TypeScript file generated JavaScript file as a proper AMD module according to Plaisio standards.
@@ -196,7 +196,7 @@ class TypeScriptFixHelper
     $tmp                      = Path::join(Path::getDirectory($path), Path::getFilenameWithoutExtension($path));
     $this->fullyQualifiedName = Path::makeRelative($tmp, $this->jsAssetPath);
     $this->namespace          = Path::getDirectory($this->fullyQualifiedName);
-    $this->className          = Path::getFilename($this->fullyQualifiedName);
+    $this->className          = Path::getFilenameWithoutExtension($this->fullyQualifiedName);
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -353,7 +353,7 @@ class TypeScriptFixHelper
 
         if (!in_array($dep, ['require', 'exports']))
         {
-          $name                                   = Path::getFilename($dep);
+          $name                                   = Path::getFilenameWithoutExtension($dep);
           $replace[sprintf('%s.%s', $arg, $name)] = $arg;
         }
       }

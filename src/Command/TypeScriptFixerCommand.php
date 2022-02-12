@@ -12,7 +12,7 @@ use SetBased\Helper\Cast;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Webmozart\PathUtil\Path;
+use Symfony\Component\Filesystem\Path;
 
 /**
  * Command for fixing from TypeScript generated JavaScript files as a proper AMD module according to Plaisio standards.

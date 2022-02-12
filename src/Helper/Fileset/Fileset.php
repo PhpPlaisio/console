@@ -6,7 +6,7 @@ namespace Plaisio\Console\Helper\Fileset;
 use FilesystemIterator;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
-use Webmozart\PathUtil\Path;
+use Symfony\Component\Filesystem\Path;
 
 /**
  * Fileset provides a method for collecting files under a base directory matching a list of include patterns and not

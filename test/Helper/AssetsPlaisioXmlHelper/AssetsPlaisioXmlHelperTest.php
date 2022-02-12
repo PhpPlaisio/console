@@ -5,7 +5,7 @@ namespace Plaisio\Console\Test\Helper\AssetsPlaisioXmlHelper;
 
 use PHPUnit\Framework\TestCase;
 use Plaisio\Console\Helper\Assets\AssetsPlaisioXmlHelper;
-use Webmozart\PathUtil\Path;
+use Symfony\Component\Filesystem\Path;
 
 /**
  * Test cases for class AssetsPlaisioXmlHelper.

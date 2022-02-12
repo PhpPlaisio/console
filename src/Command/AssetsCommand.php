@@ -9,7 +9,7 @@ use Plaisio\Console\Helper\ConfigException;
 use Plaisio\Console\Helper\PlaisioXmlUtility;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Webmozart\PathUtil\Path;
+use Symfony\Component\Filesystem\Path;
 
 /**
  * Command for coping web assets from packages to the asset (a.k.a. resources) directory.
