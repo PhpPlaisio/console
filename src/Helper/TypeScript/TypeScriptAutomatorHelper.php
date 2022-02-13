@@ -245,6 +245,27 @@ class TypeScriptAutomatorHelper
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
+   * Rewrites relative imports and recomputes the hash of a TypeScript source file.
+   *
+   * @param string $path The path to the TypeScript source file.
+   *
+   * @return void
+   */
+  private function enhanceSource(string $path): void
+  {
+    $oldLines = TypeScriptMarkHelper::sourceAsLines($path);
+    $tmp      = $this->rewriteImports(Path::getDirectory($path), $oldLines);
+    $newLines = TypeScriptMarkHelper::appendHashToLines($tmp);
+
+    if ($newLines<>$oldLines)
+    {
+      $newLines[] = '';
+      file_put_contents($path, implode(PHP_EOL, $newLines));
+    }
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
    * Handles an IN_CLOSE_WRITE of a path.
    *
    * @param string $path The path.
@@ -332,6 +353,7 @@ class TypeScriptAutomatorHelper
               break;
 
             case ($event['mask'] & IN_MOVED_TO)!==0:
+              var_dump($event);
               $this->handleMoveTo($path);
               break;
 
@@ -465,7 +487,7 @@ class TypeScriptAutomatorHelper
       return true;
     }
 
-    $tsHash = TypeScriptMarkHelper::addHashToTypeScriptSource($tsPath);
+    $tsHash = TypeScriptMarkHelper::computeHashFromSource($tsPath);
     $jsHash = TypeScriptMarkHelper::extractHashFromSource($jsPath);
 
     return ($tsHash!==$jsHash);
@@ -489,6 +511,38 @@ class TypeScriptAutomatorHelper
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
+   * Simplifies import statements.
+   *
+   * @param string[] $lines TheTypeScript source as lines.
+   *
+   * @return string[]
+   */
+  private function rewriteImports(string $dir, array $lines): array
+  {
+    $pattern = '/^import\s+(?<import>\{[^}]+\})\s+from\s+\'(?<path>[^\']+)\';$/';
+
+    foreach ($lines as $key => $line)
+    {
+      if (preg_match($pattern, $line, $matches))
+      {
+        if (str_starts_with($matches['path'], '../'))
+        {
+          $name = Path::join($dir, $matches['path']);
+          $path = $name.'.'.$this->tsExtension;
+          if (is_file($path))
+          {
+            $relative    = Path::makeRelative($name, $this->jsAssetPath);
+            $lines[$key] = sprintf('import %s from \'%s\';', $matches['import'], $relative);
+          }
+        }
+      }
+    }
+
+    return $lines;
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
    * Runs the TypeScript Fixer on a JavaScript file.
    *
    * @param string $path The path to the JavScript file.
@@ -507,6 +561,8 @@ class TypeScriptAutomatorHelper
    **/
   private function runTypeScriptTranspiler(string $path): void
   {
+    $this->enhanceSource($path);
+
     $command = ['node_modules/typescript/bin/tsc',
                 '-m',
                 'amd',

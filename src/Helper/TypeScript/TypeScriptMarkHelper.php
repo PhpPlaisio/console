@@ -10,44 +10,55 @@ class TypeScriptMarkHelper
 {
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * Adds a hash to the end of a TypeScript source file unless the source has the proper hash already and returns the
-   * hash.
+   * Appends the hash of a TypeScript source file.
+   *
+   * @param string[] $lines The TypeScript source as lines.
+   *
+   * @return string[]
+   */
+  public static function appendHashToLines(array $lines): array
+  {
+    $lines = self::removeHashFromLines($lines);
+    $hash  = md5(implode(PHP_EOL, $lines));
+    $mark  = self::getMarkMd5();
+
+    if (!str_starts_with(end($lines), '//'))
+    {
+      $lines[] = '';
+    }
+    $lines[] = $mark.$hash;
+
+    return $lines;
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
+   * Computes the hash of a TypeScript source file.
+   *
+   * @param string[] $lines The TypeScript source as lines.
+   *
+   * @return string
+   */
+  public static function computeHashFromLines(array $lines): string
+  {
+    $lines = self::removeHashFromLines($lines);
+
+    return md5(implode(PHP_EOL, $lines));
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
+   * Computes the hash of a TypeScript source file.
    *
    * @param string $path The path to the TypeScript source.
    *
    * @return string
    */
-  public static function addHashToTypeScriptSource(string $path): string
+  public static function computeHashFromSource(string $path): string
   {
-    $lines   = self::sourceAsLines($path);
-    $mark    = self::getMarkMd5();
-    $pattern = sprintf('/^%s(?<hash>.*)$/', preg_quote($mark, '/'));
-    if (!empty($lines) && preg_match($pattern, end($lines), $matches)===1)
-    {
-      $oldHash = $matches['hash'];
-      array_pop($lines);
-      $lines = self::removeEmptyTrainingLines($lines);
-    }
-    else
-    {
-      $oldHash = null;
-    }
+    $lines = self::sourceAsLines($path);
 
-    $newHash = md5(implode(PHP_EOL, $lines));
-
-    if ($oldHash!==$newHash)
-    {
-      if (!str_starts_with(end($lines), '//'))
-      {
-        $lines[] = '';
-      }
-      $lines[] = $mark.$newHash;
-      $lines[] = '';
-
-      file_put_contents($path, implode(PHP_EOL, $lines));
-    }
-
-    return $newHash;
+    return self::computeHashFromLines($lines);
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -76,6 +87,42 @@ class TypeScriptMarkHelper
   public static function getMarkUpdated(): string
   {
     return sprintf('// %s::updated', self::class);
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
+   * Removes the trailing line with the hash (if any) from a TypeScript source.
+   *
+   * @param string[] $lines The TypScript source as lines.
+   *
+   * @return string[]
+   */
+  public static function removeHashFromLines(array $lines): array
+  {
+    $mark    = self::getMarkMd5();
+    $pattern = sprintf('/^%s(?<hash>.*)$/', preg_quote($mark, '/'));
+    if (!empty($lines) && preg_match($pattern, end($lines))===1)
+    {
+      array_pop($lines);
+      $lines = self::removeEmptyTrainingLines($lines);
+    }
+
+    return $lines;
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
+   * Returns the source of a JavaScript or TypeScript source file as lines. Empty trailing lines are removed.
+   *
+   * @param string $path The path to the source.
+   *
+   * @return string[]
+   */
+  public static function sourceAsLines(string $path): array
+  {
+    $lines = explode(PHP_EOL, file_get_contents($path));
+
+    return self::removeEmptyTrainingLines($lines);
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -114,9 +161,9 @@ class TypeScriptMarkHelper
   /**
    * Removes trailing empty lines.
    *
-   * @param array $lines The lines.
+   * @param string[] $lines The lines.
    *
-   * @return array
+   * @return string[]
    */
   private static function removeEmptyTrainingLines(array $lines): array
   {
@@ -126,21 +173,6 @@ class TypeScriptMarkHelper
     }
 
     return $lines;
-  }
-
-  //--------------------------------------------------------------------------------------------------------------------
-  /**
-   * Returns the source of a JavaScript or TypeScript source file as lines. Empty trailing lines are removed.
-   *
-   * @param string $path The path to the source.
-   *
-   * @return string[]
-   */
-  private static function sourceAsLines(string $path): array
-  {
-    $lines = explode(PHP_EOL, file_get_contents($path));
-
-    return self::removeEmptyTrainingLines($lines);
   }
 
   //--------------------------------------------------------------------------------------------------------------------
