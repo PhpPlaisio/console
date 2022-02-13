@@ -70,8 +70,8 @@ class KernelPropertiesCommand extends PlaisioCommand
   /**
    * Adds properties to the kernel.
    *
-   * @param array $lines      The source of the class.
-   * @param array $properties The details of the properties.
+   * @param string[] $lines      The source of the class.
+   * @param array    $properties The details of the properties.
    *
    * @return string[]
    */
@@ -93,13 +93,13 @@ class KernelPropertiesCommand extends PlaisioCommand
     $code = [];
     foreach ($properties as $property)
     {
-      $name =  '$'.ltrim($property['name'], '$');
+      $name = '$'.ltrim($property['name'], '$');
 
       $this->io->text(sprintf('Adding property %s', $name));
 
       $code[] = rtrim(sprintf(' * @property-read %s %s %s',
                               $property['type'],
-                             $name,
+                              $name,
                               $property['description']));
     }
 
