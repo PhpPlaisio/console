@@ -70,7 +70,7 @@ class TypeScriptAutomatorCommand extends PlaisioCommand
       if ($force)
       {
         $helper = new TypeScriptAutomatorHelper($this->io, $this->jsPath);
-        $helper->once(true);
+        $helper->force();
       }
 
       if ($auto)

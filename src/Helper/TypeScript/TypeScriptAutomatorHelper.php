@@ -120,7 +120,6 @@ class TypeScriptAutomatorHelper
   private $watcher;
 
   //--------------------------------------------------------------------------------------------------------------------
-
   /**
    * Object constructor.
    *
@@ -163,16 +162,24 @@ class TypeScriptAutomatorHelper
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * Transpiles TypeScript files of which the corresponding JavScript file is out of sync.
-   *
-   * @param bool $force Whether to transpile TypeScript source files unconditionally.
+   * Transpiles all TypeScript files.
    */
-  public function once(bool $force = false): void
+  public function force(): void
+  {
+    $this->delete();
+    $this->once();
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
+   * Transpiles TypeScript files of which the corresponding JavScript file is out of sync.
+   */
+  public function once(): void
   {
     $tsPaths = $this->collectTypeScriptFiles();
     foreach ($tsPaths as $tsPath)
     {
-      if ($this->mustTranspile($tsPath) || $force)
+      if ($this->mustTranspile($tsPath))
       {
         $this->runTypeScriptTranspiler($tsPath);
       }
