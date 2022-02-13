@@ -197,7 +197,7 @@ class AssetsCommand extends PlaisioCommand
   /**
    * Copies a file.
    *
-   * @param string $pathSource The path the the source file.
+   * @param string $pathSource The path the source file.
    * @param string $pathDest   The path to the destination file.
    */
   private function copyFile(string $pathSource, string $pathDest): void

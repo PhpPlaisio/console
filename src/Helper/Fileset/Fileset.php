@@ -23,14 +23,14 @@ class Fileset
   private string $dir;
 
   /**
-   * The exclude patterns.
+   * The patterns for excluding files.
    *
    * @var array
    */
   private array $excludes;
 
   /**
-   *  The include patterns.
+   * The patterns for including files.
    *
    * @var array
    */
@@ -41,8 +41,8 @@ class Fileset
    * Object constructor.
    *
    * @param string $dir      The base directory of the fileset.
-   * @param array  $includes The include patterns.
-   * @param array  $excludes The exclude patterns.
+   * @param array  $includes The patterns for including files.
+   * @param array  $excludes The patterns for excluding files.
    */
   public function __construct(string $dir, array $includes, array $excludes)
   {

@@ -28,14 +28,14 @@ class FilesetXmlParser
   private ?string $dir = null;
 
   /**
-   * The exclude patterns.
+   * The patterns for excluding files.
    *
    * @var array
    */
   private array $excludes = [];
 
   /**
-   * The include patterns.
+   * The patterns for including files.
    *
    * @var array
    */

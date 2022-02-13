@@ -11,7 +11,7 @@ use SetBased\Helper\ProgramExecution;
 use Symfony\Component\Filesystem\Path;
 
 /**
- *  Watch the asset root directory for file events related to TypeScript files.
+ * Watch the asset root directory for file events related to TypeScript files.
  */
 class TypeScriptAutomatorHelper
 {
@@ -120,6 +120,7 @@ class TypeScriptAutomatorHelper
   private $watcher;
 
   //--------------------------------------------------------------------------------------------------------------------
+
   /**
    * Object constructor.
    *
@@ -244,7 +245,7 @@ class TypeScriptAutomatorHelper
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * Handles a IN_CLOSE_WRITE of a path.
+   * Handles an IN_CLOSE_WRITE of a path.
    *
    * @param string $path The path.
    */
@@ -268,7 +269,7 @@ class TypeScriptAutomatorHelper
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * Handles a IN_CREATE of a path.
+   * Handles an IN_CREATE of a path.
    *
    * @param string $path The path.
    */
@@ -282,7 +283,7 @@ class TypeScriptAutomatorHelper
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * Handles a IN_DELETE and IN_MOVE_FROM of a path.
+   * Handles an IN_DELETE and IN_MOVE_FROM of a path.
    *
    * @param string $path The path.
    */
@@ -297,7 +298,7 @@ class TypeScriptAutomatorHelper
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * Handles a IN_DELETE_SELF of a path.
+   * Handles an IN_DELETE_SELF of a path.
    *
    * @param string $path The path.
    * @param int    $wd   The watch descriptor.
@@ -366,12 +367,11 @@ class TypeScriptAutomatorHelper
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * Handles a IN_MOVED_TO of a path.
+   * Handles an IN_MOVED_TO of a path.
    *
    * @param string $path The path.
    */
-  private
-  function handleMoveTo(string $path): void
+  private function handleMoveTo(string $path): void
   {
     if (is_dir($path) && !in_array($path, $this->directories))
     {
@@ -388,8 +388,7 @@ class TypeScriptAutomatorHelper
   /**
    * Initializes watchers for all directories recursively under the asset root.
    */
-  private
-  function initWatchers(): void
+  private function initWatchers(): void
   {
     $dirs = $this->initWatchersFetchDirectories();
 
@@ -409,8 +408,7 @@ class TypeScriptAutomatorHelper
    *
    * @return array All found directories.
    */
-  private
-  function initWatchersFetchDirectories(): array
+  private function initWatchersFetchDirectories(): array
   {
     $dirs = [];
 
@@ -435,8 +433,7 @@ class TypeScriptAutomatorHelper
    * @param int    $mask The INOTIFY constant.
    * @param string $path The path.
    */
-  private
-  function logEvent(int $mask, string $path): void
+  private function logEvent(int $mask, string $path): void
   {
     foreach ($this->myEvents as $tmp)
     {
@@ -460,8 +457,7 @@ class TypeScriptAutomatorHelper
    *
    * @return bool
    */
-  private
-  function mustTranspile(string $tsPath): bool
+  private function mustTranspile(string $tsPath): bool
   {
     $jsPath = Path::changeExtension($tsPath, $this->jsExtension);
     if (!file_exists($jsPath))
@@ -481,8 +477,7 @@ class TypeScriptAutomatorHelper
    *
    * @param string $path The path to the file.
    */
-  private
-  function removeFile(string $path): void
+  private function removeFile(string $path): void
   {
     if (is_file($path))
     {
@@ -498,8 +493,7 @@ class TypeScriptAutomatorHelper
    *
    * @param string $path The path to the JavScript file.
    **/
-  private
-  function runTypeScriptFixer(string $path): void
+  private function runTypeScriptFixer(string $path): void
   {
     $helper = new TypeScriptFixHelper($this->io, $this->jsAssetPath);
     $helper->fixJavaScriptFile($path);
@@ -511,8 +505,7 @@ class TypeScriptAutomatorHelper
    *
    * @param string $path The path to the JavScript file.
    **/
-  private
-  function runTypeScriptTranspiler(string $path): void
+  private function runTypeScriptTranspiler(string $path): void
   {
     $command = ['node_modules/typescript/bin/tsc',
                 '-m',
@@ -542,8 +535,7 @@ class TypeScriptAutomatorHelper
   /**
    * Watch the asset root directory for file events.
    */
-  private
-  function watch(): void
+  private function watch(): void
   {
     do
     {
@@ -564,6 +556,7 @@ class TypeScriptAutomatorHelper
       }
     } while (true);
   }
+
   //--------------------------------------------------------------------------------------------------------------------
 }
 

@@ -123,7 +123,7 @@ class PhpStratumSourcesCommand extends PlaisioCommand
 
     if (substr($sources, 0, 5)!='file:')
     {
-      throw new RuntimeException("Setting '%s' in section '%s' in file '%s' must have format 'file:<filename>'",
+      throw new RuntimeException("Setting '%s' in section '%s' in file '%s' must be formatted like 'file:<filename>'",
                                  'sources',
                                  'loader',
                                  $configFilename);

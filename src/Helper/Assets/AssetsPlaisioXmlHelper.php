@@ -165,7 +165,7 @@ class AssetsPlaisioXmlHelper
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * Parses the attributes of a asset node.
+   * Parses the attributes of an asset node.
    *
    * @param \DOMNode $node The child node.
    *
