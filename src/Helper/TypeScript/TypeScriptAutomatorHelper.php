@@ -526,20 +526,20 @@ class TypeScriptAutomatorHelper
    */
   private function rewriteImports(string $dir, array $lines): array
   {
-    $pattern = '/^import\s+(?<import>\{[^}]+\})\s+from\s+\'(?<path>[^\']+)\';$/';
+    $pattern = '/^import\s+(?<import>\{[^}]+\}\s+from\s*)?\'(?<path>[^\']+)\';$/';
 
     foreach ($lines as $key => $line)
     {
       if (preg_match($pattern, $line, $matches))
       {
-        if (str_starts_with($matches['path'], '../'))
+        if (str_starts_with($matches['path'], './') || str_starts_with($matches['path'], '../'))
         {
           $name = Path::join($dir, $matches['path']);
           $path = $name.'.'.$this->tsExtension;
           if (is_file($path))
           {
             $relative    = Path::makeRelative($name, $this->jsAssetPath);
-            $lines[$key] = sprintf('import %s from \'%s\';', $matches['import'], $relative);
+            $lines[$key] = sprintf('import %s\'%s\';', $matches['import'], $relative);
           }
         }
       }
