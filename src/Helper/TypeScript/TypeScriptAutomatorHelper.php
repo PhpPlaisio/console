@@ -360,7 +360,6 @@ class TypeScriptAutomatorHelper
               break;
 
             case ($event['mask'] & IN_MOVED_TO)!==0:
-              var_dump($event);
               $this->handleMoveTo($path);
               break;
 
