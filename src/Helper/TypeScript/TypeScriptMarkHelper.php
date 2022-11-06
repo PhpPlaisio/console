@@ -22,7 +22,7 @@ class TypeScriptMarkHelper
     $hash  = md5(implode(PHP_EOL, $lines));
     $mark  = self::getMarkMd5();
 
-    if (!str_starts_with(end($lines), '//'))
+    if (empty($lines) || !str_starts_with(end($lines), '//'))
     {
       $lines[] = '';
     }
