@@ -261,7 +261,7 @@ class TypeScriptAutomatorHelper
   private function enhanceSource(string $path): void
   {
     $oldLines = TypeScriptMarkHelper::sourceAsLines($path);
-    $tmp      = $this->rewriteImports(Path::getDirectory($path), $oldLines);
+    $tmp      = $this->rewriteImportsAndExports(Path::getDirectory($path), $oldLines);
     $newLines = TypeScriptMarkHelper::appendHashToLines($tmp);
 
     if ($newLines<>$oldLines)
@@ -517,15 +517,15 @@ class TypeScriptAutomatorHelper
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * Simplifies import statements.
+   * Rewrites relative import and export statements.
    *
    * @param string[] $lines TheTypeScript source as lines.
    *
    * @return string[]
    */
-  private function rewriteImports(string $dir, array $lines): array
+  private function rewriteImportsAndExports(string $dir, array $lines): array
   {
-    $pattern = '/^import\s+(?<import>\{[^}]+\}\s+from\s*)?\'(?<path>[^\']+)\';$/';
+    $pattern = '/^(?<type>import|export)\s+(?<what>((\{[^}]+\})|\*)\s+from\s*)?(\'(?<path>[^\']+)\');$/';
 
     foreach ($lines as $key => $line)
     {
@@ -538,7 +538,7 @@ class TypeScriptAutomatorHelper
           if (is_file($path))
           {
             $relative    = Path::makeRelative($name, $this->jsAssetPath);
-            $lines[$key] = sprintf('import %s\'%s\';', $matches['import'], $relative);
+            $lines[$key] = sprintf('%s %s\'%s\';', $matches['type'], $matches['what'], $relative);
           }
         }
       }
