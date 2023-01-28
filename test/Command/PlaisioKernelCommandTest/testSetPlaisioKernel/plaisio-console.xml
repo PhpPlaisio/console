@@ -1,0 +1,5 @@
+<console>
+    <kernel>
+        <factory>\Plaisio\Console\Test\TestPlaisioKernel::create</factory>
+    </kernel>
+</console>

@@ -24,6 +24,9 @@ class TwoPhaseWrite
    * Object constructor.
    *
    * @param PlaisioStyle $io The output decorator.
+   *
+   * @since 3.0.0
+   * @api
    */
   public function __construct(PlaisioStyle $io)
   {
@@ -45,6 +48,9 @@ class TwoPhaseWrite
    * @param string $content  The content that must be written.
    *
    * @return bool True if the file was saved. False the file is up-to-date
+   *
+   * @since 3.0.0
+   * @api
    */
   public function write(string $filename, string $content): bool
   {

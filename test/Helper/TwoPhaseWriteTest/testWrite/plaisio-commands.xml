@@ -1,0 +1,3 @@
+<commands>
+    <command name="plaisio:two-phase-write-test">\Plaisio\Console\Test\Helper\TwoPhaseWriteTest\TestTwoFaseWriteCommand</command>
+</commands>

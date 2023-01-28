@@ -1,0 +1,3 @@
+<commands>
+    <command name="plaisio:style-test">\Plaisio\Console\Test\Style\TestStyleCommand</command>
+</commands>

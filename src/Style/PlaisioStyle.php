@@ -44,12 +44,15 @@ class PlaisioStyle extends SymfonyStyle
   //--------------------------------------------------------------------------------------------------------------------
   /**
    * Writes a debug message.
+   *
+   * @param string $format    The format string, see https://www.php.net/manual/en/function.vsprintf.php
+   * @param mixed  ...$values The values to be used in the format string.
    */
-  public function logDebug(): void
+  public function logDebug(string $format, mixed ...$values): void
   {
     if ($this->getVerbosity()>=OutputInterface::VERBOSITY_DEBUG)
     {
-      $message = $this->composeMessage(func_get_args());
+      $message = $this->composeMessage($format, $values);
       $this->writeln('<info>'.$message.'</info>');
     }
   }
@@ -57,12 +60,15 @@ class PlaisioStyle extends SymfonyStyle
   //--------------------------------------------------------------------------------------------------------------------
   /**
    * Writes an information message.
+   *
+   * @param string $format    The format string, see https://www.php.net/manual/en/function.vsprintf.php
+   * @param mixed  ...$values The values to be used in the format string.
    */
-  public function logInfo(): void
+  public function logInfo(string $format, mixed ...$values): void
   {
     if ($this->getVerbosity()>=OutputInterface::VERBOSITY_NORMAL)
     {
-      $message = $this->composeMessage(func_get_args());
+      $message = $this->composeMessage($format, $values);
       $this->writeln('<info>'.$message.'</info>');
     }
   }
@@ -70,12 +76,15 @@ class PlaisioStyle extends SymfonyStyle
   //--------------------------------------------------------------------------------------------------------------------
   /**
    * Writes a notification message.
+   *
+   * @param string $format    The format string, see https://www.php.net/manual/en/function.vsprintf.php
+   * @param mixed  ...$values The values to be used in the format string.
    */
-  public function logNote(): void
+  public function logNote(string $format, mixed ...$values): void
   {
     if ($this->getVerbosity()>=OutputInterface::VERBOSITY_NORMAL)
     {
-      $message = $this->composeMessage(func_get_args());
+      $message = $this->composeMessage($format, $values);
       $this->writeln('<note> ! [NOTE] '.$message.'</note>');
     }
   }
@@ -83,12 +92,15 @@ class PlaisioStyle extends SymfonyStyle
   //--------------------------------------------------------------------------------------------------------------------
   /**
    * Writes a verbose message.
+   *
+   * @param string $format    The format string, see https://www.php.net/manual/en/function.vsprintf.php
+   * @param mixed  ...$values The values to be used in the format string.
    */
-  public function logVerbose(): void
+  public function logVerbose(string $format, mixed ...$values): void
   {
     if ($this->getVerbosity()>=OutputInterface::VERBOSITY_VERBOSE)
     {
-      $message = $this->composeMessage(func_get_args());
+      $message = $this->composeMessage($format, $values);
       $this->writeln('<info>'.$message.'</info>');
     }
   }
@@ -96,12 +108,15 @@ class PlaisioStyle extends SymfonyStyle
   //--------------------------------------------------------------------------------------------------------------------
   /**
    * Writes a very verbose message.
+   *
+   * @param string $format    The format string, see https://www.php.net/manual/en/function.vsprintf.php
+   * @param mixed  ...$values The values to be used in the format string.
    */
-  public function logVeryVerbose(): void
+  public function logVeryVerbose(string $format, mixed ...$values): void
   {
     if ($this->getVerbosity()>=OutputInterface::VERBOSITY_VERY_VERBOSE)
     {
-      $message = $this->composeMessage(func_get_args());
+      $message = $this->composeMessage($format, $values);
       $this->writeln('<info>'.$message.'</info>');
     }
   }
@@ -110,25 +125,20 @@ class PlaisioStyle extends SymfonyStyle
   /**
    * Composes the message based on the arguments.
    *
-   * @param array $args The arguments.
+   * @param string $format The format string, see https://www.php.net/manual/en/function.vsprintf.php
+   * @param array  $values The values to be used in the format string.
    *
    * @return string
    */
-  private function composeMessage(array $args): string
+  private function composeMessage(string $format, array $values): string
   {
-    $format = array_shift($args);
-
-    if ($format===null)
-    {
-      $message = '';
-    }
-    elseif (empty($args))
+    if (empty($values))
     {
       $message = $format;
     }
     else
     {
-      $message = vsprintf($format, $args);
+      $message = vsprintf($format, $values);
     }
 
     return $message;

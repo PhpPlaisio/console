@@ -1,0 +1,3 @@
+<commands>
+    <command name="plaisio:kernel-command-test">\Plaisio\Console\Test\Command\PlaisioKernelCommandTest\TestPlaisioKernelCommand</command>
+</commands>

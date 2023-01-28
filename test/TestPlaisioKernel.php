@@ -1,24 +1,28 @@
 <?php
 declare(strict_types=1);
 
-namespace Plaisio\Console\Application;
+namespace Plaisio\Console\Test;
 
-use Symfony\Component\Console\Application;
+use Plaisio\PlaisioKernel;
 
 /**
- * The Plaisio application.
+ * A commandline kernel for testing purposes.
  */
-class PlaisioApplication extends Application
+class TestPlaisioKernel extends PlaisioKernel
 {
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * PlaisioApplication constructor.
+   * Returns an instance of this kernel.
+   *
+   * @param string $name Ignored.
+   *
+   * @return static
    */
-  public function __construct()
+  public static function create(string $name): self
   {
-    parent::__construct('Plaisio', sprintf('(PHP: %s)', PHP_VERSION));
+    unset($name);
 
-    $this->setCommandLoader(new CommandLoader());
+    return new self();
   }
 
   //--------------------------------------------------------------------------------------------------------------------
