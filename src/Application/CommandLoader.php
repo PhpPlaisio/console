@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Plaisio\Console\Application;
 
-use Plaisio\Console\Helper\PlaisioXmlHelper;
-use Plaisio\Console\Helper\PlaisioXmlUtility;
+use Plaisio\Console\Helper\PlaisioXmlQueryHelper;
+use Plaisio\Console\Helper\PlaisioXmlPathHelper;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\CommandLoader\FactoryCommandLoader;
 
@@ -36,11 +36,11 @@ class CommandLoader extends FactoryCommandLoader
 
     if (method_exists($command, 'setPlaisioKernel'))
     {
-      $path   = PlaisioXmlUtility::plaisioXmlPath('console');
+      $path   = PlaisioXmlPathHelper::plaisioXmlPath('console');
       $kernel = null;
       if (file_exists($path))
       {
-        $helper  = new PlaisioXmlHelper($path);
+        $helper  = new PlaisioXmlQueryHelper($path);
         $factory = $helper->queryConsoleKernelFactory();
 
         if ($factory!==null)
@@ -67,12 +67,12 @@ class CommandLoader extends FactoryCommandLoader
    */
   private function findPlaisioCommands(): array
   {
-    $plaisioXmlList = PlaisioXmlUtility::findPlaisioXmlAll('commands');
+    $plaisioXmlList = PlaisioXmlPathHelper::findPlaisioXmlAll('commands');
 
     $commands = [];
     foreach ($plaisioXmlList as $path)
     {
-      $helper   = new PlaisioXmlHelper($path);
+      $helper   = new PlaisioXmlQueryHelper($path);
       $commands = array_merge($commands, $helper->queryPlaisioCommands());
     }
 

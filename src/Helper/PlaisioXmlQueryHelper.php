@@ -6,9 +6,9 @@ namespace Plaisio\Console\Helper;
 use Plaisio\Console\Exception\ConfigException;
 
 /**
- * Helper class for retrieving information from plaisio.xml files.
+ * Helper class for querying information from a plaisio.xml file.
  */
-class PlaisioXmlHelper
+class PlaisioXmlQueryHelper
 {
   //--------------------------------------------------------------------------------------------------------------------
   /**
@@ -27,7 +27,7 @@ class PlaisioXmlHelper
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * PlaisioXmlHelper constructor.
+   * PlaisioXmlQueryHelper constructor.
    *
    * @param string $path Path to the PhpPlaisio configuration file.
    */

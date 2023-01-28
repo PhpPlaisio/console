@@ -7,9 +7,9 @@ use DirectoryIterator;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
- * Utility class for retrieving information about plaisio.xml files.
+ * Utility class for querying paths to plaisio.xml files.
  */
-class PlaisioXmlUtility
+class PlaisioXmlPathHelper
 {
   //--------------------------------------------------------------------------------------------------------------------
   /**
