@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Plaisio\Console\Helper;
 
-use SetBased\Exception\RuntimeException;
+use Plaisio\Console\Exception\ConfigException;
 
 /**
  * Helper class for retrieving information from plaisio.xml files.
@@ -42,7 +42,7 @@ class PlaisioXmlHelper
     }
     catch (\Throwable $exception)
     {
-      throw new RuntimeException([$exception], 'Failed to read Plaisio config %s', $this->path);
+      throw new ConfigException([$exception], 'Failed to read Plaisio config %s', $this->path);
     }
   }
 
