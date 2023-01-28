@@ -30,7 +30,7 @@ class CommandLoader extends FactoryCommandLoader
    *
    * @return Command
    */
-  public function get(string $name)
+  public function get(string $name): Command
   {
     $command = parent::get($name);
 

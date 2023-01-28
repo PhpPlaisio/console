@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Plaisio\Console\Helper;
 
 use DirectoryIterator;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * Utility class for retrieving information about plaisio.xml files.
@@ -115,7 +116,9 @@ class PlaisioXmlUtility
    */
   public static function vendorDir(): string
   {
-    return self::relativePath(dirname(__DIR__, 4));
+    $reflection = new \ReflectionClass(Filesystem::class);
+
+    return self::relativePath(dirname($reflection->getFileName(), 3));
   }
 
   //--------------------------------------------------------------------------------------------------------------------

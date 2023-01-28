@@ -37,7 +37,10 @@ class TypeScriptFixHelperTest extends TestCase
     $tester->run(['command' => 'plaisio:type-script-fixer',
                   'path'    => $jsPath]);
 
-    if ($tester->getStatusCode()!==0) echo $tester->getDisplay();
+    if ($tester->getStatusCode()!==0)
+    {
+      echo $tester->getDisplay();
+    }
 
     self::assertSame(0, $tester->getStatusCode());
     self::assertFileEquals($expectedPath, $jsPath);

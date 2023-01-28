@@ -31,7 +31,7 @@ class KernelPropertyReadWriteCommand extends PlaisioCommand
   /**
    * @inheritdoc
    */
-  protected function execute(InputInterface $input, OutputInterface $output)
+  protected function execute(InputInterface $input, OutputInterface $output): int
   {
     $this->io->title('Plaisio: Read/Write Kernel Property');
 

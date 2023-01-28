@@ -88,7 +88,7 @@ class TypeScriptFixHelper
   /**
    * Fixes from a TypeScript file generated JavaScript file as a proper AMD module according to Plaisio standards.
    *
-   * @param string $path The path to the from a TypeScript file generated JavaScript file.
+   * @param string $path The path to the JavaScript file generated from a TypeScript file.
    */
   public function fixJavaScriptFile(string $path): void
   {
@@ -257,7 +257,7 @@ class TypeScriptFixHelper
     {
       $dep = trim($dep, '"');
 
-      if (substr($dep, 0, 1)==='.')
+      if (str_starts_with($dep, '.'))
       {
         $depPath    = Path::join($this->namespace, $dep);
         $deps[$key] = '"'.$depPath.'"';

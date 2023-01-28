@@ -29,7 +29,7 @@ class PhpStratumSourcesCommand extends PlaisioCommand
   /**
    * @inheritdoc
    */
-  protected function execute(InputInterface $input, OutputInterface $output)
+  protected function execute(InputInterface $input, OutputInterface $output): int
   {
     $this->io->title('Plaisio: PhpStratum Sources');
 
@@ -121,7 +121,7 @@ class PhpStratumSourcesCommand extends PlaisioCommand
 
     $sources = $settings['loader']['sources'];
 
-    if (substr($sources, 0, 5)!='file:')
+    if (!str_starts_with($sources, 'file:'))
     {
       throw new RuntimeException("Setting '%s' in section '%s' in file '%s' must be formatted like 'file:<filename>'",
                                  'sources',

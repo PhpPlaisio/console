@@ -1,0 +1,3 @@
+<commands>
+    <command name="plaisio:type-script-fixer">\Plaisio\Console\Command\TypeScriptFixerCommand</command>
+</commands>

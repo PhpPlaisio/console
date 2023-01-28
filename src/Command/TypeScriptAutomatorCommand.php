@@ -44,7 +44,7 @@ class TypeScriptAutomatorCommand extends PlaisioCommand
   /**
    * @inheritdoc
    */
-  protected function execute(InputInterface $input, OutputInterface $output)
+  protected function execute(InputInterface $input, OutputInterface $output): int
   {
     $auto   = Cast::toManBool($input->getOption('auto'));
     $delete = Cast::toManBool($input->getOption('delete'));

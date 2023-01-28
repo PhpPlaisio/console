@@ -24,7 +24,7 @@ trait PlaisioKernelCommand
    *
    * @param PlaisioKernel $nub The kernel of PhpPlaisio.
    */
-  public function setPlaisioKernel(PlaisioKernel $nub)
+  public function setPlaisioKernel(PlaisioKernel $nub): void
   {
     $this->nub = $nub;
   }

@@ -88,7 +88,7 @@ class FilesetXmlParser
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * Parses the attributes of a include or exclude child node of the fileset.
+   * Parses the attributes of an included or excluded child node of the fileset.
    *
    * @param \DOMNode $node  The child node.
    * @param array    $array The includes or exclude array.

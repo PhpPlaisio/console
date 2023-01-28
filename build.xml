@@ -1,5 +1,4 @@
 <project name="PhpPlaisio" default="build" basedir=".">
-    <taskdef name="readSemanticVersion" classname="vendor.setbased.phing-extensions.src.Task.ReadSemanticVersionTask"/>
     <property name="VERSION" value="0.0.0"/>
 
     <!-- Update dependencies -->
@@ -41,48 +40,12 @@
         </exec>
     </target>
 
-    <!-- Creates a new version/release. -->
-    <target name="version">
-        <readSemanticVersion file=".version" versionProperty="VERSION" haltOnError="true"/>
-        <!-- Set version of application -->
-        <reflexive>
-            <fileset dir=".">
-                <include name="src/Application/PlaisioApplication.php"/>
-            </fileset>
-            <filterchain>
-                <replaceregexp>
-                    <regexp pattern="parent::__construct\('Plaisio', .*"
-                            replace="parent::__construct('Plaisio', '${VERSION}');"/>
-                </replaceregexp>
-            </filterchain>
-        </reflexive>
-
-        <exec executable="git" checkreturn="true" passthru="true">
-            <arg value="commit"/>
-            <arg value="-a"/>
-            <arg value="-m"/>
-            <arg value="Release: ${VERSION}"/>
-        </exec>
-        <exec executable="git" checkreturn="true" passthru="true">
-            <arg value="push"/>
-        </exec>
-        <exec executable="git" checkreturn="true" passthru="true">
-            <arg value="tag"/>
-            <arg value="${VERSION}"/>
-        </exec>
-        <exec executable="git" checkreturn="true" passthru="true">
-            <arg value="push"/>
-            <arg value="origin"/>
-            <arg value="${VERSION}"/>
-        </exec>
-    </target>
-
     <!-- Runs all unit tests -->
     <target name="unit">
-        <exec command="bin/phpunit" passthru="true" checkreturn="true"/>
+        <exec executable="bin/phpunit" passthru="true" checkreturn="true"/>
     </target>
 
-    <target name="build">
+    <target name="build" depends="update,unit">
         <echo message=""/>
     </target>
 </project>

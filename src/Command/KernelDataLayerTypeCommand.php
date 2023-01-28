@@ -41,7 +41,7 @@ class KernelDataLayerTypeCommand extends PlaisioCommand
   /**
    * @inheritdoc
    */
-  protected function execute(InputInterface $input, OutputInterface $output)
+  protected function execute(InputInterface $input, OutputInterface $output): int
   {
     $this->io->title('Plaisio: DataLayer Type Annotation');
 
