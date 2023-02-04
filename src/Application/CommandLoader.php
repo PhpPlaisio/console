@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Plaisio\Console\Application;
 
+use Plaisio\Console\Exception\ConfigException;
 use Plaisio\Console\Helper\PlaisioXmlQueryHelper;
 use Plaisio\Console\Helper\PlaisioXmlPathHelper;
 use Symfony\Component\Console\Command\Command;
@@ -52,7 +53,7 @@ class CommandLoader extends FactoryCommandLoader
 
       if ($kernel===null)
       {
-        throw new \InvalidArgumentException(sprintf('Kernel factory not found in %s.', $path));
+        throw new ConfigException(sprintf('Kernel factory not found in %s.', $path));
       }
     }
 
