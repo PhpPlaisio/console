@@ -20,7 +20,8 @@ class PlaisioKernelCommandTest extends TestCase
    */
   public function testSetPlaisioKernel(): void
   {
-    putenv(sprintf('PLAISIO_CONFIG_DIR=%s', Path::join(__DIR__, 'PlaisioKernelCommandTest', __FUNCTION__)));
+    copy(Path::join(__DIR__, 'PlaisioKernelCommandTest', __FUNCTION__, 'plaisio-commands.xml'), 'plaisio-commands.xml');
+    copy(Path::join(__DIR__, 'PlaisioKernelCommandTest', __FUNCTION__, 'plaisio-console.xml'), 'plaisio-console.xml');
 
     $application = new PlaisioApplication();
     $application->setAutoExit(false);
@@ -30,6 +31,9 @@ class PlaisioKernelCommandTest extends TestCase
 
     self::assertSame(TestPlaisioKernel::class, $tester->getDisplay());
     self::assertSame(0, $tester->getStatusCode());
+
+    unlink('plaisio-commands.xml');
+    unlink('plaisio-console.xml');
   }
 
   //--------------------------------------------------------------------------------------------------------------------

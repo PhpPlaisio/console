@@ -6,6 +6,7 @@ namespace Plaisio\Console\Test\Style;
 use PHPUnit\Framework\TestCase;
 use Plaisio\Console\Application\PlaisioApplication;
 use Symfony\Component\Console\Tester\ApplicationTester;
+use Symfony\Component\Filesystem\Path;
 
 /**
  * Test cases for class PlaisioStyle.
@@ -18,11 +19,10 @@ class PlaisioStyleTest extends TestCase
    */
   public function testLogging(): void
   {
-    putenv(sprintf('PLAISIO_CONFIG_DIR=%s', __DIR__));
+    copy(Path::join(__DIR__, 'plaisio-commands.xml'), 'plaisio-commands.xml');
 
     $application = new PlaisioApplication();
     $application->setAutoExit(false);
-
     $tester = new ApplicationTester($application);
     $tester->run(['command' => 'plaisio:style-test']);
 
@@ -33,6 +33,8 @@ level: info
  ! [NOTE] note
 %s", trim($tester->getDisplay()));
     self::assertSame(0, $tester->getStatusCode());
+
+    unlink('plaisio-commands.xml');
   }
 
   //--------------------------------------------------------------------------------------------------------------------

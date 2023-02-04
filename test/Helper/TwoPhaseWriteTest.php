@@ -19,7 +19,7 @@ class TwoPhaseWriteTest extends TestCase
    */
   public function testWrite(): void
   {
-    putenv(sprintf('PLAISIO_CONFIG_DIR=%s', Path::join(__DIR__, 'TwoPhaseWriteTest', __FUNCTION__)));
+    copy(Path::join(__DIR__, 'TwoPhaseWriteTest', __FUNCTION__, 'plaisio-commands.xml'), 'plaisio-commands.xml');
 
     $application = new PlaisioApplication();
     $application->setAutoExit(false);
@@ -32,6 +32,8 @@ class TwoPhaseWriteTest extends TestCase
  File hello.txt is up to date
  Wrote hello.txt", trim($tester->getDisplay()));
     self::assertSame(0, $tester->getStatusCode());
+
+    unlink('plaisio-commands.xml');
   }
 
   //--------------------------------------------------------------------------------------------------------------------
