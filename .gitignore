@@ -1,5 +1,5 @@
 /.idea/
-/.phpunit.result.cache
+/.phpunit.cache/
 /bin/composer
 /bin/jp.php
 /bin/jsonlint
@@ -15,8 +15,6 @@
 /bin/stratum
 /bin/yaml-lint
 /composer.lock
-/custom.task.properties
-/custom.type.properties
 /doc/
 /test/coverage.xml
 /test/report/
