@@ -16,7 +16,7 @@ class TestStyleCommand extends PlaisioCommand
   /**
    * @inheritdoc
    */
-  protected function configure()
+  protected function configure(): void
   {
     $this->setName('plaisio:style-test');
   }

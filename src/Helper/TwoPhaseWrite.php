@@ -83,7 +83,7 @@ class TwoPhaseWrite
     }
     else
     {
-      $this->io->text(sprintf('File <fso>%s</fso> is up to date', OutputFormatter::escape($filename)));
+      $this->io->text(sprintf('File <fso>%s</fso> is up-to-date', OutputFormatter::escape($filename)));
     }
 
     return $flag;

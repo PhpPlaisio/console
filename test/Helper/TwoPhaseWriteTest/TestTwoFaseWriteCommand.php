@@ -17,7 +17,7 @@ class TestTwoFaseWriteCommand extends PlaisioCommand
   /**
    * @inheritdoc
    */
-  protected function configure()
+  protected function configure(): void
   {
     $this->setName('plaisio:two-phase-write-test')
          ->addArgument('filename');

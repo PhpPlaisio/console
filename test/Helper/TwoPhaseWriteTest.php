@@ -29,11 +29,12 @@ class TwoPhaseWriteTest extends TestCase
                   'filename' => 'hello.txt']);
 
     self::assertSame("Wrote hello.txt
- File hello.txt is up to date
+ File hello.txt is up-to-date
  Wrote hello.txt", trim($tester->getDisplay()));
     self::assertSame(0, $tester->getStatusCode());
 
     unlink('plaisio-commands.xml');
+    unlink('hello.txt');
   }
 
   //--------------------------------------------------------------------------------------------------------------------
