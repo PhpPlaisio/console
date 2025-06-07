@@ -34,7 +34,6 @@ class TwoPhaseWriteTest extends TestCase
     self::assertSame(0, $tester->getStatusCode());
 
     unlink('plaisio-commands.xml');
-    unlink('hello.txt');
   }
 
   //--------------------------------------------------------------------------------------------------------------------
